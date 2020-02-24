@@ -4,9 +4,10 @@ import {WawaComponent} from './components/wawa/wawa.component';
 import {RouterModule} from '@angular/router';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
+import { HahaComponent } from './components/haha/haha.component';
 
 @NgModule({
-  declarations: [WawaComponent],
+  declarations: [WawaComponent, HahaComponent],
   imports: [
     CommonModule,
     RouterModule,
@@ -14,7 +15,8 @@ import {FormsModule} from '@angular/forms';
     HttpClientModule
   ],
   exports: [
-    WawaComponent
+    WawaComponent,
+    HahaComponent
   ]
 })
 export class UiModule { }
