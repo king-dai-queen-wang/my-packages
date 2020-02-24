@@ -1,14 +1,15 @@
 {
   "name": "dww-angular-component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:lib": "ng-packagr -p package.json",
+    "deploye:lib": "npm publish",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e",
-    "packagr": "ng-packagr -p ng-package.json"
+    "e2e": "ng e2e"
   },
   "private": false,
   "dependencies": {
