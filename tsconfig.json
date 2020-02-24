@@ -17,7 +17,15 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ng-angular-component": [
+        "dist/ng-angular-component"
+      ],
+      "ng-angular-component/*": [
+        "dist/ng-angular-component/*"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

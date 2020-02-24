@@ -7,9 +7,10 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "packagr": "ng-packagr -p ng-package.json"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/animations": "~8.2.14",
     "@angular/common": "~8.2.14",
@@ -25,12 +26,13 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.803.20",
+    "@angular-devkit/build-ng-packagr": "~0.803.25",
     "@angular/cli": "~8.3.20",
     "@angular/compiler-cli": "~8.2.14",
     "@angular/language-service": "~8.2.14",
-    "@types/node": "~8.9.4",
     "@types/jasmine": "~3.3.8",
     "@types/jasminewd2": "~2.0.3",
+    "@types/node": "~8.9.4",
     "codelyzer": "^5.0.0",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",
@@ -39,9 +41,47 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
+    "ng-packagr": "^5.7.1",
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
+    "tsickle": "^0.37.0",
     "tslint": "~5.15.0",
     "typescript": "~3.5.3"
-  }
+  },
+  "description": "This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.20.",
+  "main": "src/ui.module.ts",
+  "ngPackage": {
+    "lib": {
+      "entryFile": "index.ts"
+    },
+    "whitelistedNonPeerDependencies": [
+      "@angular/animations",
+      "@angular/common",
+      "@angular/compiler",
+      "@angular/core",
+      "@angular/forms",
+      "@angular/http",
+      "@angular/platform-browser",
+      "@angular/platform-browser-dynamic",
+      "@angular/router",
+      "core-js",
+      "moment",
+      "responsive-css-starter",
+      "rxjs",
+      "zone.js"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/king-dai-queen-wang/my-packages.git"
+  },
+  "keywords": [
+    "angular"
+  ],
+  "author": "david dai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/king-dai-queen-wang/my-packages/issues"
+  },
+  "homepage": "https://github.com/king-dai-queen-wang/my-packages#readme"
 }
