@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:lib": "ng-packagr -p package.json",
-    "deploye:lib": "npm publish",
+    "deploy:lib": "npm publish",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
