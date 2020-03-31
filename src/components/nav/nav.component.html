@@ -1,0 +1,12 @@
+<nav>
+  <div class="logo">dww</div>
+  <div class="nav-menu">
+    <li *ngFor="let item of data;index as index" [routerLink]="item.url" class="nav-menu-item">{{item.name}}</li>
+  </div>
+  <div class="burger" (click)="toggleBurger($event)">
+    <span class="top-line"></span>
+    <span class="middle-line"></span>
+    <span class="bottom-line"></span>
+  </div>
+  <header></header>
+</nav>

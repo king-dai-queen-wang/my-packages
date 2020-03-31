@@ -9,7 +9,11 @@
     "deploy:lib": "npm publish",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "clean-remote": "ssh ubuntu@ rm -rf /home/ubuntu/dww-test/tmp/*",
+    "copy-remote": "scp -r dist/* ubuntu@:/home/ubuntu/dww-test/tmp",
+    "build:prod": "ng build --prod",
+    "deploy:prod": "npm run clean-remote & npm run copy-remote"
   },
   "private": false,
   "dependencies": {
