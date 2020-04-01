@@ -14,7 +14,8 @@ import {HomeModule} from './features/home/home.module';
     UiModule,
     BrowserModule,
     HomeModule,
-    AppRoutingModule
+    AppRoutingModule,
+
   ],
   providers: [],
   bootstrap: [AppComponent]

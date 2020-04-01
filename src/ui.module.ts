@@ -6,18 +6,22 @@ import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import { NavComponent } from './components/nav/nav.component';
 import './styles.scss';
+import {NgxEchartsModule} from 'ngx-echarts';
+import { WolkflowComponent } from './components/wolkflow/wolkflow.component';
 
 @NgModule({
-  declarations: [WawaComponent, NavComponent],
+  declarations: [WawaComponent, NavComponent, WolkflowComponent],
   imports: [
     CommonModule,
     RouterModule,
     FormsModule,
+    NgxEchartsModule,
     HttpClientModule
   ],
   exports: [
     WawaComponent,
-    NavComponent
+    NavComponent,
+    WolkflowComponent
   ]
 })
 export class UiModule { }
