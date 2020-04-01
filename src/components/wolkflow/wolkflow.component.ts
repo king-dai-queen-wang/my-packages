@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import * as echarts from 'echarts';
 @Component({
   selector: 'dww-wolkflow',
   templateUrl: './wolkflow.component.html',

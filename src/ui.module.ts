@@ -8,9 +8,10 @@ import { NavComponent } from './components/nav/nav.component';
 import './styles.scss';
 import {NgxEchartsModule} from 'ngx-echarts';
 import { WolkflowComponent } from './components/wolkflow/wolkflow.component';
+import { DragFlowComponent } from './components/drag-flow/drag-flow.component';
 
 @NgModule({
-  declarations: [WawaComponent, NavComponent, WolkflowComponent],
+  declarations: [WawaComponent, NavComponent, WolkflowComponent, DragFlowComponent],
   imports: [
     CommonModule,
     RouterModule,
@@ -21,6 +22,7 @@ import { WolkflowComponent } from './components/wolkflow/wolkflow.component';
   exports: [
     WawaComponent,
     NavComponent,
+    DragFlowComponent,
     WolkflowComponent
   ]
 })
