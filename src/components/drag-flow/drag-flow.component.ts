@@ -70,19 +70,19 @@ export class DragFlowComponent implements OnInit {
       }
 
       const a = [params.data.source, params.data.target];
-      for (let i = 0; i < this.xydata.length; i++) {
-        if (params.data.source === this.xydata[i][0] && params.data.target === this.xydata[i][1]) {
-          this.del = i;
-          this.xydata.splice(this.del, 1);
+      for (let i = 0; i < self.xydata.length; i++) {
+        if (params.data.source === self.xydata[i][0] && params.data.target === self.xydata[i][1]) {
+          self.del = i;
+          self.xydata.splice(self.del, 1);
           // 当xydata值改变时linkss方法需要重新跑一变
-          const linkss = this.xydata.map(function(item, i) {
+          const linkss = self.xydata.map(function(item, i) {
             return {
-              source: this.xydata[i][0],
-              target: this.xydata[i][1]
+              source: self.xydata[i][0],
+              target: self.xydata[i][1]
             };
           });
           // 重新载入的东西都写在这里
-          this.myChart.setOption({
+          self.myChart.setOption({
             series: [{
               edges: linkss,
             }]
