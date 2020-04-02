@@ -1,2 +1,2 @@
-<div echarts (chartInit)="onChartReady($event)" [options]="option" style="height: 600px;"></div>
+<div class="echarts" echarts [autoResize]="true" theme="light" (chartInit)="onChartReady($event)" [options]="option"></div>
 <button (click)="getOption()">ss</button>

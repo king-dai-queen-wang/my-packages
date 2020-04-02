@@ -23,19 +23,19 @@ export class DragFlowComponent implements OnInit {
   dataArr = [
     {
       name: 'A',
-      value: [15, 50]
+      value: [115, 150]
     },
     {
       name: 'B',
-      value: [-50, 10]
+      value: [500, 10]
     },
     {
       name: 'C',
-      value: [-55, -70]
+      value: [55, 700]
     },
     {
       name: 'D',
-      value: [40, -40]
+      value: [40, 40]
     },
   ];
 
@@ -92,6 +92,13 @@ export class DragFlowComponent implements OnInit {
       }
 
     });
+
+
+    this.myChart.on('click', 'series.line', function (params) {
+      console.log(params);
+    });
+
+    this.myChart.on('dataZoom', this.updatePosition);
   }
 
   initOption() {
@@ -108,27 +115,52 @@ export class DragFlowComponent implements OnInit {
         text: '可拖动流程图'
       },
       grid: {
-
+        left: 10,
+        right: 10,
+        top: 10,
+        bottom: 10
       },
       // 定义X轴
       xAxis: {
-        min: -100,
-        max: 100,
+        min: 0,
+        max: 1000,
         type: 'value',
         axisLine: {
           onZero: false
         },
-        show: false
+        axisLabel: {show: false, inside: true},
+        splitArea : {show : false},
+        splitNumber: 10,
+        scale: true,
+        show: true
       },
       yAxis: {
-        min: -100,
-        max: 100,
+        min: 0,
+        max: 1000,
         type: 'value',
         axisLine: {
           onZero: false
         },
-        show: false
+        axisLabel: {show: false, inside: false},
+        splitArea : {show : false},
+        splitNumber: 10,
+        show: true
       },
+      dataZoom: [{
+        show: true,
+        type: 'inside',
+        filterMode: 'none',
+        xAxisIndex: [0],
+        startValue: -500,
+        endValue: 500
+      }, {
+        show: true,
+        type: 'inside',
+        filterMode: 'none',
+        yAxisIndex: [0],
+        startValue: -500,
+        endValue: 500
+      }],
       series: [{
         // 设置id很重要
         id: 'a',
@@ -138,7 +170,7 @@ export class DragFlowComponent implements OnInit {
         coordinateSystem: 'cartesian2d',
         // 设置球的大小
         symbolSize: this.symbolSize,
-
+        symbol: 'roundRect',
         label: {
           show: true,
           formatter: (d, i) => {
@@ -146,13 +178,13 @@ export class DragFlowComponent implements OnInit {
           }
         },
         itemStyle: {
-          borderColor: '#22faf7',
+          borderColor: '#123456',
           borderWidth: 3,
-          color: '#123456',
+          color: '#fff',
         },
         // 设置连线形式为箭头
         edgeSymbol: ['circle', 'arrow'],
-        edgeSymbolSize: [4, 10],
+        edgeSymbolSize: [4, 20],
         // 指定数据数组
         data: echarts.util.map(this.dataArr, function(item, di) {
           return item.value;
@@ -162,7 +194,7 @@ export class DragFlowComponent implements OnInit {
         // 指定连线颜色
         lineStyle: {
           normal: {
-            color: '#22faf7'
+            color: '#000'
           }
         },
       }],
@@ -192,7 +224,7 @@ export class DragFlowComponent implements OnInit {
           position: this.myChart.convertToPixel('grid', item.value),
           shape: {
             // 拖动点的大小
-            r: this.symbolSize / 2 - 2
+            r: [this.symbolSize / 2 - 2]
           },
           style: {
             fill: '#3FA7DC50',
@@ -204,9 +236,9 @@ export class DragFlowComponent implements OnInit {
           invisible: false,
           // 指定圈被拖拽（可以与不可以）
           draggable: true,
-          // ondrag: echarts.util.curry(onPointDragging, dataIndex),
+          ondrag: echarts.util.curry(this.onPointDragging, dataIndex),
           onclick: echarts.util.curry(this.initLinks, dataIndex),
-          onmouseup: echarts.util.curry(this.onPointDragging, dataIndex),
+          // onmousemove: echarts.util.curry(this.onPointDragging, dataIndex),
 
           // 层级
           z: 100
@@ -217,6 +249,20 @@ export class DragFlowComponent implements OnInit {
   }
 // 图形元素拖动后， 修改节点位置
   onPointDragging(dataIndex, dx, dy) {
+    console.log(self.myChart, dx, dy)
+    if (this.position[0] <= 0) {
+      this.position[0] = 0;
+    }
+    if (this.position[0] >= self.myChart.getWidth()) {
+      this.position[0] = self.myChart.getWidth();
+    }
+
+    if (this.position[1] <= 0) {
+      this.position[1] = 0;
+    }
+    if (this.position[1] >= self.myChart.getHeight()) {
+      this.position[1] = self.myChart.getHeight();
+    }
     self.dataArr[dataIndex].value = self.myChart.convertFromPixel('grid', this.position);
     // Update data
     self.myChart.setOption({
@@ -255,7 +301,7 @@ export class DragFlowComponent implements OnInit {
               // 指定连线颜色
               lineStyle: {
                 normal: {
-                  color: '#22faf7'
+                  color: '#123456'
                 }
               }
             }]
@@ -272,11 +318,10 @@ export class DragFlowComponent implements OnInit {
     this.myChart = myChart;
     this.bindingEvent();
     // 在demo里，必须要加setTimeout ，否则执行 myChart.convertToPixel 会报错
-    const _this = this;
     setTimeout(function() {
-      _this.initGraphic();
+      self.initGraphic();
       // 窗口大小改事件
-      window.addEventListener('resize', _this.updatePosition);
+      window.addEventListener('resize', self.updatePosition);
     }, 0);
   }
 
