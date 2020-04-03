@@ -19,6 +19,7 @@ export class DragFlowComponent implements OnInit {
     [1, 2],
     [2, 3]
   ];
+
 // 节点坐标
   dataArr = [
     {
@@ -38,9 +39,9 @@ export class DragFlowComponent implements OnInit {
       value: [40, 40]
     },
   ];
-
+  gridOffset: 10;
 // 设置点的大小
-  symbolSize = 70;
+  symbolSize = [100, 70];
 
 // 当0时候表示输入起点坐标，其他值输入终点坐标
   position = 0;
@@ -65,40 +66,56 @@ export class DragFlowComponent implements OnInit {
   bindingEvent() {
     // 点击事件 , 删除连线
     this.myChart.on('click', function(params) {
-      if (params.componentType !== 'series' || params.dataType !== 'edge') {
+      console.log(params);
+      if (params.componentType === 'series' && params.dataType === 'edge') {
+        self.confirmDialog('确认删除连线吗', self.deleteLine.bind(self, params), () => {});
         return;
       }
 
-      const a = [params.data.source, params.data.target];
-      for (let i = 0; i < self.xydata.length; i++) {
-        if (params.data.source === self.xydata[i][0] && params.data.target === self.xydata[i][1]) {
-          self.del = i;
-          self.xydata.splice(self.del, 1);
-          // 当xydata值改变时linkss方法需要重新跑一变
-          const linkss = self.xydata.map(function(item, i) {
-            return {
-              source: self.xydata[i][0],
-              target: self.xydata[i][1]
-            };
-          });
-          // 重新载入的东西都写在这里
-          self.myChart.setOption({
-            series: [{
-              edges: linkss,
-            }]
-          });
-          return true;
-        }
-      }
+      if (params.componentType === 'graph') {
 
+      }
     });
 
 
     this.myChart.on('click', 'series.line', function (params) {
       console.log(params);
+
     });
 
     this.myChart.on('dataZoom', this.updatePosition);
+
+    const zr = this.myChart.getZr();
+
+    // 画布监听click，增加节点
+    zr.on('click', function (params) {
+      const pointInPixel = [params.offsetX, params.offsetY];
+      const pointInGrid = self.myChart.convertFromPixel('grid', pointInPixel);
+
+      self.confirmDialog('确认添加吗', () => {
+        if (self.myChart.containPixel('grid', pointInPixel)) {
+          self.dataArr.push({name: 'E'+ Math.random(), value: pointInGrid});
+
+          self.myChart.setOption({
+            series: [{
+              id: 'a',
+              data: echarts.util.map(self.dataArr, function(item, di) {
+                return item;
+              }),
+            }]
+          });
+          self.initGraphic();
+        }
+      });
+
+    });
+
+    zr.on('mousemove', function (params) {
+      const pointInPixel = [params.offsetX, params.offsetY];
+      console.log(pointInPixel);
+      zr.setCursorStyle(self.myChart.containPixel('grid', pointInPixel) ? 'copy' : 'default');
+    });
+
   }
 
   initOption() {
@@ -115,15 +132,33 @@ export class DragFlowComponent implements OnInit {
         text: '可拖动流程图'
       },
       grid: {
-        left: 10,
-        right: 10,
-        top: 10,
-        bottom: 10
+        left: this.gridOffset,
+        right: this.gridOffset,
+        top: this.gridOffset,
+        bottom: this.gridOffset
+      },
+      tooltip: {
+        triggerOn: 'none',
+        // 鼠标是否可进入提示框浮层中，默认为false，如需详情内交互，如添加链接，按钮，
+        enterable: true,
+        trigger: 'item',
+        borderColor: '#333',
+        borderWidth: 2,
+        backgroundColor: '#fff',
+
+        textStyle: {
+          color: '#000'
+        },
+        formatter: function (params) {
+          const data = params.data.value || [0, 0];
+          return data[0].toFixed(2) + ', ' + data[1].toFixed(2);
+        }
       },
       // 定义X轴
       xAxis: {
         min: 0,
         max: 1000,
+        position: 'top',
         type: 'value',
         axisLine: {
           onZero: false
@@ -137,16 +172,19 @@ export class DragFlowComponent implements OnInit {
       yAxis: {
         min: 0,
         max: 1000,
+        position: 'left',
+        inverse: true,
         type: 'value',
         axisLine: {
-          onZero: false
+          onZero: true
         },
         axisLabel: {show: false, inside: false},
         splitArea : {show : false},
         splitNumber: 10,
         show: true
       },
-      dataZoom: [{
+      dataZoom: [
+        {
         show: true,
         type: 'inside',
         filterMode: 'none',
@@ -175,7 +213,8 @@ export class DragFlowComponent implements OnInit {
           show: true,
           formatter: (d, i) => {
             return this.dataArr[d.dataIndex].name;
-          }
+          },
+          color: '#000',
         },
         itemStyle: {
           borderColor: '#123456',
@@ -187,7 +226,7 @@ export class DragFlowComponent implements OnInit {
         edgeSymbolSize: [4, 20],
         // 指定数据数组
         data: echarts.util.map(this.dataArr, function(item, di) {
-          return item.value;
+          return item;
         }),
         // 指定连线方式
         edges: this.links,
@@ -214,17 +253,20 @@ export class DragFlowComponent implements OnInit {
   }
 
 // 绘制图形元素
-  initGraphic = () => {
+  initGraphic() {
     this.myChart.setOption({
       graphic: echarts.util.map(this.dataArr, (item, dataIndex) => {
         return {
-          // 圆形
-          type: 'circle',
+          // 矩形
+          type: 'rect',
           // 将坐标转化为像素
           position: this.myChart.convertToPixel('grid', item.value),
           shape: {
             // 拖动点的大小
-            r: [this.symbolSize / 2 - 2]
+            x: -1 * (this.symbolSize[0] / 2),
+            y: -1 * (this.symbolSize[1] / 2),
+            width: this.symbolSize[0],
+            height: this.symbolSize[1]
           },
           style: {
             fill: '#3FA7DC50',
@@ -239,7 +281,8 @@ export class DragFlowComponent implements OnInit {
           ondrag: echarts.util.curry(this.onPointDragging, dataIndex),
           onclick: echarts.util.curry(this.initLinks, dataIndex),
           // onmousemove: echarts.util.curry(this.onPointDragging, dataIndex),
-
+          onmousemove: echarts.util.curry(this.showTooltip.bind(self), dataIndex),
+          onmouseout: echarts.util.curry(this.hideTooltip.bind(self), dataIndex),
           // 层级
           z: 100
 
@@ -247,18 +290,32 @@ export class DragFlowComponent implements OnInit {
       })
     });
   }
+
+  showTooltip(dataIndex) {
+    this.myChart.dispatchAction({
+      type: 'showTip',
+      seriesIndex: 0,
+      dataIndex: dataIndex
+    });
+  }
+
+  hideTooltip(dataIndex) {
+    this.myChart.dispatchAction({
+      type: 'hideTip'
+    });
+  }
 // 图形元素拖动后， 修改节点位置
   onPointDragging(dataIndex, dx, dy) {
-    console.log(self.myChart, dx, dy)
+    console.log(this.position);
     if (this.position[0] <= 0) {
-      this.position[0] = 0;
+      this.position[0] = (self.symbolSize[0] / 2);
     }
     if (this.position[0] >= self.myChart.getWidth()) {
-      this.position[0] = self.myChart.getWidth();
+      this.position[0] = self.myChart.getWidth() - (self.symbolSize[0] / 2);
     }
 
     if (this.position[1] <= 0) {
-      this.position[1] = 0;
+      this.position[1] = (self.symbolSize[1] / 2);
     }
     if (this.position[1] >= self.myChart.getHeight()) {
       this.position[1] = self.myChart.getHeight();
@@ -325,7 +382,44 @@ export class DragFlowComponent implements OnInit {
     }, 0);
   }
 
+  deleteLine(params) {
+    const a = [params.data.source, params.data.target];
+    for (let i = 0; i < self.xydata.length; i++) {
+      if (params.data.source === self.xydata[i][0] && params.data.target === self.xydata[i][1]) {
+        self.del = i;
+        self.xydata.splice(self.del, 1);
+        // 当xydata值改变时linkss方法需要重新跑一变
+        const linkss = self.xydata.map(function(item, i) {
+          return {
+            source: self.xydata[i][0],
+            target: self.xydata[i][1]
+          };
+        });
+        // 重新载入的东西都写在这里
+        self.myChart.setOption({
+          series: [{
+            edges: linkss,
+          }]
+        });
+        return true;
+      }
+    }
+  }
+
+  deleteNode(params) {
+    console.log(params);
+  }
+
   getOption() {
     console.log(this.myChart.getOption());
+  }
+
+  confirmDialog(confirmMsg, confirmFn?, cancelFn?) {
+    const r = confirm(confirmMsg);
+    if (r) {
+      confirmFn && confirmFn();
+    } else {
+      cancelFn && cancelFn();
+    }
   }
 }
