@@ -249,6 +249,7 @@ export class DragFlowComponent implements OnInit {
         edges: this.links,
         // 指定连线颜色
         lineStyle: {
+          curveness: 0.3,
           normal: {
             color: '#000'
           }
@@ -434,6 +435,7 @@ export class DragFlowComponent implements OnInit {
                 edges: linkss,
                 // 指定连线颜色
                 lineStyle: {
+                  curveness: 0.3,
                   normal: {
                     color: '#123456'
                   }
@@ -556,6 +558,9 @@ export class DragFlowComponent implements OnInit {
       });
 
       console.log('delete over', self.myChart)
+      self.xydata.forEach((item, index) => {
+        self.initLinks(index);
+      });
 
       // self.initGraphic();
       // self.refreshChart();
