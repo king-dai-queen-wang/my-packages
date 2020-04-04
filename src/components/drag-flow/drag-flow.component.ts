@@ -64,47 +64,54 @@ export class DragFlowComponent implements OnInit {
   }
 
   bindingEvent() {
+    const zr = this.myChart.getZr();
+    // this.myChart.on('click', function(params) {
+    //   console.log(params);
+    //   if (params.componentType === 'graph') {
+    //     console.log('click graph', params)
+    //   }
+    // });
+
     // 点击事件 , 删除连线
-    this.myChart.on('click', function(params) {
-      console.log(params);
-      if (params.componentType === 'series' && params.dataType === 'edge') {
-        self.confirmDialog('确认删除连线吗', self.deleteLine.bind(self, params), () => {});
-        return;
-      }
-
-      if (params.componentType === 'graph') {
-
-      }
+    this.myChart.on('click', {dataType: 'edge'}, function (params) {
+      self.confirmDialog('确认删除连线吗', self.deleteLine.bind(self, params), () => {});
+      return;
     });
 
+    this.myChart.on('click', 'series.graph.nodes', function (params) {
+      console.log('click nodes', params);
+      self.initLinks(params.dataIndex);
+      // onclick: echarts.util.curry(this.initLinks, dataIndex),
+      //   onmousemove: echarts.util.curry(this.showTooltip.bind(self), dataIndex),
+      //   onmouseout: echarts.util.curry(this.hideTooltip.bind(self), dataIndex),
+    });
 
-    this.myChart.on('click', 'series.line', function (params) {
-      console.log(params);
+    this.myChart.on('mousemove', 'series.graph.nodes', function (params) {
+      console.log('click nodes', params);
+      // self.showTooltip(params.dataIndex);
+    });
 
+    this.myChart.on('mouseout', 'series.graph.nodes', function (params) {
+      console.log('click nodes', params);
+      // self.hideTooltip(params.dataIndex);
     });
 
     this.myChart.on('dataZoom', this.updatePosition);
 
-    const zr = this.myChart.getZr();
-
     // 画布监听click，增加节点
     zr.on('click', function (params) {
+      console.log(params);
+      if (typeof params.target !== 'undefined') {
+        return;
+      }
       const pointInPixel = [params.offsetX, params.offsetY];
       const pointInGrid = self.myChart.convertFromPixel('grid', pointInPixel);
 
       self.confirmDialog('确认添加吗', () => {
         if (self.myChart.containPixel('grid', pointInPixel)) {
           self.dataArr.push({name: 'E'+ Math.random(), value: pointInGrid});
-
-          self.myChart.setOption({
-            series: [{
-              id: 'a',
-              data: echarts.util.map(self.dataArr, function(item, di) {
-                return item;
-              }),
-            }]
-          });
           self.initGraphic();
+          self.setNodes();
         }
       });
 
@@ -112,7 +119,6 @@ export class DragFlowComponent implements OnInit {
 
     zr.on('mousemove', function (params) {
       const pointInPixel = [params.offsetX, params.offsetY];
-      console.log(pointInPixel);
       zr.setCursorStyle(self.myChart.containPixel('grid', pointInPixel) ? 'copy' : 'default');
     });
 
@@ -122,8 +128,11 @@ export class DragFlowComponent implements OnInit {
     const xydata = this.xydata;
     this.links = this.xydata.map(function(item, i) {
       return {
+        id: Math.random(),
+        name: `${xydata[i][0]} -> ${xydata[i][1]}`,
         source: xydata[i][0],
-        target: xydata[i][1]
+        target: xydata[i][1],
+        lineStyle: {normal: {}}
       };
     });
 
@@ -138,21 +147,6 @@ export class DragFlowComponent implements OnInit {
         bottom: this.gridOffset
       },
       tooltip: {
-        triggerOn: 'none',
-        // 鼠标是否可进入提示框浮层中，默认为false，如需详情内交互，如添加链接，按钮，
-        enterable: true,
-        trigger: 'item',
-        borderColor: '#333',
-        borderWidth: 2,
-        backgroundColor: '#fff',
-
-        textStyle: {
-          color: '#000'
-        },
-        formatter: function (params) {
-          const data = params.data.value || [0, 0];
-          return data[0].toFixed(2) + ', ' + data[1].toFixed(2);
-        }
       },
       // 定义X轴
       xAxis: {
@@ -225,9 +219,7 @@ export class DragFlowComponent implements OnInit {
         edgeSymbol: ['circle', 'arrow'],
         edgeSymbolSize: [4, 20],
         // 指定数据数组
-        data: echarts.util.map(this.dataArr, function(item, di) {
-          return item;
-        }),
+        nodes: this.dataArr,
         // 指定连线方式
         edges: this.links,
         // 指定连线颜色
@@ -256,57 +248,63 @@ export class DragFlowComponent implements OnInit {
   initGraphic() {
     this.myChart.setOption({
       graphic: echarts.util.map(this.dataArr, (item, dataIndex) => {
-        return {
-          // 矩形
-          type: 'rect',
-          // 将坐标转化为像素
-          position: this.myChart.convertToPixel('grid', item.value),
-          shape: {
-            // 拖动点的大小
-            x: -1 * (this.symbolSize[0] / 2),
-            y: -1 * (this.symbolSize[1] / 2),
-            width: this.symbolSize[0],
-            height: this.symbolSize[1]
-          },
-          style: {
-            fill: '#3FA7DC50',
-            borderColor: '#22faf7',
-            borderWidth: 1,
-          },
-
-          // 指定虚拟圈是否可见  false 可见
-          invisible: false,
-          // 指定圈被拖拽（可以与不可以）
-          draggable: true,
-          ondrag: echarts.util.curry(this.onPointDragging, dataIndex),
-          onclick: echarts.util.curry(this.initLinks, dataIndex),
-          // onmousemove: echarts.util.curry(this.onPointDragging, dataIndex),
-          onmousemove: echarts.util.curry(this.showTooltip.bind(self), dataIndex),
-          onmouseout: echarts.util.curry(this.hideTooltip.bind(self), dataIndex),
-          // 层级
-          z: 100
-
-        };
+        return this.initGraphicItem(item, dataIndex);
       })
     });
   }
 
-  showTooltip(dataIndex) {
-    this.myChart.dispatchAction({
-      type: 'showTip',
-      seriesIndex: 0,
-      dataIndex: dataIndex
-    });
+  initGraphicItem(item, dataIndex) {
+    return {
+      // 矩形
+      type: 'rect',
+      // 将坐标转化为像素
+      position: this.myChart.convertToPixel('grid', item.value),
+      shape: {
+        // 拖动点的大小
+        x: -1 * (this.symbolSize[0] / 2),
+        y: 0,
+        width: this.symbolSize[0] / 2,
+        height: this.symbolSize[1] / 2
+      },
+      style: {
+        fill: '#3FA7DC50',
+        borderColor: '#22faf7',
+        borderWidth: 1,
+      },
+
+      // 指定虚拟圈是否可见  false 可见
+      invisible: false,
+      // 指定圈被拖拽（可以与不可以）
+      draggable: true,
+      ondrag: echarts.util.curry(this.onPointDragging, dataIndex),
+      // 层级
+      z: 100
+    };
   }
 
-  hideTooltip(dataIndex) {
-    this.myChart.dispatchAction({
-      type: 'hideTip'
+  setNodes() {
+    this.myChart.setOption({
+      series: [{
+        id: 'a',
+        nodes: this.dataArr
+      }]
     });
   }
+  // showTooltip(dataIndex) {
+  //   this.myChart.dispatchAction({
+  //     type: 'showTip',
+  //     seriesIndex: 0,
+  //     dataIndex: dataIndex
+  //   });
+  // }
+
+  // hideTooltip(dataIndex) {
+  //   this.myChart.dispatchAction({
+  //     type: 'hideTip'
+  //   });
+  // }
 // 图形元素拖动后， 修改节点位置
   onPointDragging(dataIndex, dx, dy) {
-    console.log(this.position);
     if (this.position[0] <= 0) {
       this.position[0] = (self.symbolSize[0] / 2);
     }
@@ -321,11 +319,11 @@ export class DragFlowComponent implements OnInit {
       this.position[1] = self.myChart.getHeight();
     }
     self.dataArr[dataIndex].value = self.myChart.convertFromPixel('grid', this.position);
-    // Update data
+    // Update nodes
     self.myChart.setOption({
       series: [{
         id: 'a',
-        data: self.dataArr
+        nodes: self.dataArr
       }]
     });
 
@@ -342,27 +340,29 @@ export class DragFlowComponent implements OnInit {
         } else {
           this.positionTarget = i;
           this.position = 0;
-          this.xydata.push([this.positionSource, this.positionTarget]);
-          // 当xydata值改变时linkss方法需要重新跑一变
-          const xyData = this.xydata;
-          const linkss = this.xydata.map(function(item, i) {
-            return {
-              source: xyData[i][0],
-              target: xyData[i][1]
-            };
-          });
-          // 重新载入的东西都写在这里
-          this.myChart.setOption({
-            series: [{
-              edges: linkss,
-              // 指定连线颜色
-              lineStyle: {
-                normal: {
-                  color: '#123456'
+          if (!this.hasRelation([this.positionSource, this.positionTarget])){
+            this.xydata.push([this.positionSource, this.positionTarget]);
+            // 当xydata值改变时linkss方法需要重新跑一变
+            const xyData = this.xydata;
+            const linkss = this.xydata.map(function(item, i) {
+              return {
+                source: xyData[i][0],
+                target: xyData[i][1]
+              };
+            });
+            // 重新载入的东西都写在这里
+            this.myChart.setOption({
+              series: [{
+                edges: linkss,
+                // 指定连线颜色
+                lineStyle: {
+                  normal: {
+                    color: '#123456'
+                  }
                 }
-              }
-            }]
-          });
+              }]
+            });
+          }
           return true;
         }
         break;
@@ -422,4 +422,10 @@ export class DragFlowComponent implements OnInit {
       cancelFn && cancelFn();
     }
   }
+
+   private hasRelation(relation: number[]): boolean {
+      return this.xydata.some((item, index) => {
+        return (item[0] === relation[0] && item[1] === relation[1]);
+      });
+   }
 }
