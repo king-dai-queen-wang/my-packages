@@ -231,7 +231,7 @@ export class DragFlowComponent implements OnInit {
         label: {
           show: true,
           formatter: (d, i) => {
-            return this.dataArr[d.dataIndex].name;
+            return this.dataArr[d.dataIndex] && this.dataArr[d.dataIndex].name;
           },
           color: '#000',
         },
@@ -531,20 +531,32 @@ export class DragFlowComponent implements OnInit {
       self.dataArr.splice(deleteNodeIndex, 1);
 
       self.myChart.setOption({
+        graphic: [
+          {
+            id: `graphic_drag_${params.id}`,
+            $action: 'remove',
+          } , {
+            id: `graphic_delete_${params.id}`,
+            $action: 'remove',
+          }]
+      });
+
+      self.myChart.setOption({
         series: [{
           id: 'a',
           edges: afterDeletedLines,
-          nodes: self.dataArr,
-        }],
-        graphic: [
-          {
-          id: `graphic_drag_${params.id}`,
-          $action: 'remove',
-        } , {
-          id: `graphic_delete_${params.id}`,
-          $action: 'remove',
         }]
       });
+
+      self.myChart.setOption({
+        series: [{
+          id: 'a',
+          nodes: self.dataArr,
+        }],
+      });
+
+      console.log('delete over', self.myChart)
+
       // self.initGraphic();
       // self.refreshChart();
       // self.bindingEvent();
