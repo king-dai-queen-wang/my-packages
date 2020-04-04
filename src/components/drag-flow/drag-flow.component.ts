@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import * as echarts from 'echarts';
 let self;
 @Component({
@@ -7,7 +7,8 @@ let self;
   styleUrls: ['./drag-flow.component.scss']
 })
 export class DragFlowComponent implements OnInit {
-
+  @Input() operateMode: 'deleteNodes' | 'addNodes' | 'none' = 'none';
+  currentSelectedNode;
   //
 // 节点可拖动
 // 前后点击两个节点，可以对节点进行连接
@@ -15,42 +16,49 @@ export class DragFlowComponent implements OnInit {
 // 动态添加、删除节点 ，还未完成
 // 关系坐标
   xydata = [
-    [0, 1],
-    [1, 2],
-    [2, 3]
+    ['id-a', 'id-b'],
+    ['id-b', 'id-c'],
+    ['id-c', 'id-d']
   ];
 
 // 节点坐标
   dataArr = [
     {
+      id: 'id-a',
       name: 'A',
-      value: [115, 150]
+      value: [115, 150],
     },
     {
+      id: 'id-b',
       name: 'B',
       value: [500, 10]
     },
     {
+      id: 'id-c',
       name: 'C',
       value: [55, 700]
     },
     {
+      id: 'id-d',
       name: 'D',
       value: [40, 40]
     },
   ];
+
+  graphicArr = [];
+
   gridOffset: 10;
 // 设置点的大小
   symbolSize = [100, 70];
 
 // 当0时候表示输入起点坐标，其他值输入终点坐标
-  position = 0;
+  selectedNode = 0;
+  position;
 // 起点
   positionSource;
 // 钟点
   positionTarget;
 // 设置判断点击线还是点击点
-  ok = 1;
 // 删除数组的索引位置
   del;
   links;
@@ -74,34 +82,44 @@ export class DragFlowComponent implements OnInit {
 
     // 点击事件 , 删除连线
     this.myChart.on('click', {dataType: 'edge'}, function (params) {
+      if (params.dataType !== 'edge') {
+        return;
+      }
       self.confirmDialog('确认删除连线吗', self.deleteLine.bind(self, params), () => {});
       return;
     });
 
-    this.myChart.on('click', 'series.graph.nodes', function (params) {
+    this.myChart.on('click', {dataType: 'node'}, function (params) {
+      if (params.dataType !== 'node') {
+        return;
+      }
       console.log('click nodes', params);
+      self.selectedNodes(params);
       self.initLinks(params.dataIndex);
       // onclick: echarts.util.curry(this.initLinks, dataIndex),
       //   onmousemove: echarts.util.curry(this.showTooltip.bind(self), dataIndex),
       //   onmouseout: echarts.util.curry(this.hideTooltip.bind(self), dataIndex),
     });
 
-    this.myChart.on('mousemove', 'series.graph.nodes', function (params) {
-      console.log('click nodes', params);
-      // self.showTooltip(params.dataIndex);
+    this.myChart.on('mousemove', {dataType: 'node'}, function (params) {
+      // console.log('click nodes', params);
+      self.focusNodes(params.dataIndex);
     });
 
-    this.myChart.on('mouseout', 'series.graph.nodes', function (params) {
-      console.log('click nodes', params);
-      // self.hideTooltip(params.dataIndex);
+    this.myChart.on('mouseout', {dataType: 'node'}, function (params) {
+      // console.log('click nodes', params);
+      self.unFocusNodes(params.dataIndex);
     });
 
-    this.myChart.on('dataZoom', this.updatePosition);
+    this.myChart.on('dataZoom', self.updatePosition.bind(self));
 
     // 画布监听click，增加节点
     zr.on('click', function (params) {
-      console.log(params);
-      if (typeof params.target !== 'undefined') {
+      if (typeof params.target === 'undefined') {
+        // self.selectedNode = null;
+      }
+
+      if (typeof params.target !== 'undefined' || self.operateMode !== 'addNodes') {
         return;
       }
       const pointInPixel = [params.offsetX, params.offsetY];
@@ -109,17 +127,24 @@ export class DragFlowComponent implements OnInit {
 
       self.confirmDialog('确认添加吗', () => {
         if (self.myChart.containPixel('grid', pointInPixel)) {
-          self.dataArr.push({name: 'E'+ Math.random(), value: pointInGrid});
+          const id = 'E'+ Math.random();
+          self.dataArr.push({name: id, id, value: pointInGrid});
           self.initGraphic();
           self.setNodes();
+          self.clearOperateStatus();
         }
       });
 
     });
 
     zr.on('mousemove', function (params) {
+      zr.setCursorStyle('default');
       const pointInPixel = [params.offsetX, params.offsetY];
-      zr.setCursorStyle(self.myChart.containPixel('grid', pointInPixel) ? 'copy' : 'default');
+      if (self.myChart.containPixel('grid', pointInPixel)) {
+        if (self.operateMode === 'addNodes') {
+          zr.setCursorStyle('copy');
+        }
+      }
     });
 
   }
@@ -128,7 +153,7 @@ export class DragFlowComponent implements OnInit {
     const xydata = this.xydata;
     this.links = this.xydata.map(function(item, i) {
       return {
-        id: Math.random(),
+        id: `edge_${xydata[i][0]}->${xydata[i][1]}`,
         name: `${xydata[i][0]} -> ${xydata[i][1]}`,
         source: xydata[i][0],
         target: xydata[i][1],
@@ -234,7 +259,7 @@ export class DragFlowComponent implements OnInit {
   }
 
 // 重新定位图形元素
-  updatePosition = () => {
+  updatePosition() {
     this.myChart.setOption({
       graphic: echarts.util.map(this.dataArr, (item, dataIndex) => {
         return {
@@ -242,19 +267,27 @@ export class DragFlowComponent implements OnInit {
         };
       })
     });
+    // self.initGraphic();
+    // self.bindingEvent();
   }
 
 // 绘制图形元素
   initGraphic() {
+    const res = [];
+    this.dataArr.map((item, dataIndex) => {
+      res.push(this.initGraphicDragBtnItem(item, dataIndex));
+      res.push(this.initGraphicDeleteBtnItem(item, dataIndex));
+      return res;
+    });
+    this.graphicArr = res;
     this.myChart.setOption({
-      graphic: echarts.util.map(this.dataArr, (item, dataIndex) => {
-        return this.initGraphicItem(item, dataIndex);
-      })
+      graphic: res
     });
   }
 
-  initGraphicItem(item, dataIndex) {
+  initGraphicDragBtnItem(item, dataIndex) {
     return {
+      id: `graphic_drag_${item.id}`,
       // 矩形
       type: 'rect',
       // 将坐标转化为像素
@@ -267,7 +300,8 @@ export class DragFlowComponent implements OnInit {
         height: this.symbolSize[1] / 2
       },
       style: {
-        fill: '#3FA7DC50',
+        fill : '#3FA7DC50',
+        lineWidth: 2,
         borderColor: '#22faf7',
         borderWidth: 1,
       },
@@ -278,10 +312,41 @@ export class DragFlowComponent implements OnInit {
       draggable: true,
       ondrag: echarts.util.curry(this.onPointDragging, dataIndex),
       // 层级
-      z: 100
+      z: 3
     };
   }
+  initGraphicDeleteBtnItem(item, dataIndex) {
+    return {
+      id: `graphic_delete_${item.id}`,
+      // 矩形
+      type: 'image',
+      // 将坐标转化为像素
+      position: this.myChart.convertToPixel('grid', item.value),
+      shape: {
+        // 拖动点的大小
+        x: -1 * (this.symbolSize[0] / 2),
+        y: -1 * (this.symbolSize[1] / 2),
+      },
+      style: {
+        image: 'https://iknowpc.bdimg.com/static/common/widget/search-box-new/img/logo-new.aff256e.png',
+        fill : '#ddd',
+        width: 30,
+        height: 30,
+        lineWidth: 2,
+        borderColor: '#22faf7',
+        borderWidth: 1,
+      },
 
+      // 指定虚拟圈是否可见  false 可见
+      invisible: false,
+      // 指定圈被拖拽（可以与不可以）
+      draggable: false,
+      // ondrag: echarts.util.curry(this.onPointDragging, dataIndex),
+      onclick: this.deleteNode.bind(this, item, dataIndex),
+      // 层级
+      z: 3
+    };
+  }
   setNodes() {
     this.myChart.setOption({
       series: [{
@@ -326,6 +391,7 @@ export class DragFlowComponent implements OnInit {
         nodes: self.dataArr
       }]
     });
+    self.initGraphic();
 
   }
 
@@ -333,15 +399,17 @@ export class DragFlowComponent implements OnInit {
   initLinks = (dataIndex) => {
     for (let i = 0; i < this.dataArr.length; i++) {
       if (i === dataIndex) {
-        this.ok = 0;
-        if (this.position === 0) {
+        if (this.selectedNode === 0) {
           this.positionSource = i;
-          this.position = 1;
+          this.selectedNode = 1;
         } else {
+          // if (this.selectedNode === null) {
+          //   return;
+          // }
           this.positionTarget = i;
-          this.position = 0;
-          if (!this.hasRelation([this.positionSource, this.positionTarget])){
-            this.xydata.push([this.positionSource, this.positionTarget]);
+          this.selectedNode = 0;
+          if (!this.hasRelation([this.dataArr[this.positionSource].id, this.dataArr[this.positionTarget].id])) {
+            this.xydata.push([this.dataArr[this.positionSource].id, this.dataArr[this.positionTarget].id]);
             // 当xydata值改变时linkss方法需要重新跑一变
             const xyData = this.xydata;
             const linkss = this.xydata.map(function(item, i) {
@@ -362,6 +430,10 @@ export class DragFlowComponent implements OnInit {
                 }
               }]
             });
+            // self.selectedNode = null;
+            // self.positionSource = null;
+            // self.positionTarget = null;
+          //  清空选择的node
           }
           return true;
         }
@@ -371,16 +443,38 @@ export class DragFlowComponent implements OnInit {
     }
   }
 
-  onChartReady = (myChart: echarts.ECharts) => {
+  onChartReady(myChart: echarts.ECharts) {
     this.myChart = myChart;
-    this.bindingEvent();
     // 在demo里，必须要加setTimeout ，否则执行 myChart.convertToPixel 会报错
     setTimeout(function() {
       self.initGraphic();
+      self.bindingEvent();
       // 窗口大小改事件
-      window.addEventListener('resize', self.updatePosition);
+      window.addEventListener('resize', self.updatePosition.bind(self));
     }, 0);
   }
+
+  selectedNodes(node) {
+    // this.myChart.dispatchAction({
+    //   type: 'focusNodeAdjacency',
+    //   dataIndex,
+    // });
+  }
+
+  focusNodes(dataIndex: number) {
+    this.myChart.dispatchAction({
+      type: 'focusNodeAdjacency',
+      dataIndex,
+    });
+  }
+
+  unFocusNodes(dataIndex: number) {
+    this.myChart.dispatchAction({
+      type: 'unfocusNodeAdjacency',
+      dataIndex,
+    });
+  }
+
 
   deleteLine(params) {
     const a = [params.data.source, params.data.target];
@@ -406,8 +500,45 @@ export class DragFlowComponent implements OnInit {
     }
   }
 
-  deleteNode(params) {
-    console.log(params);
+  deleteNode(params, deleteNodeIndex) {
+    console.log('delete node', params);
+    self.confirmDialog('确认删除节点吗' + params.name,() => {
+      const afterDeletedLines = [];
+      const afterDeleteGraphic = [];
+      self.xydata.forEach((item, lindexIndex) => {
+        if (!item.includes(params.id)) {
+          afterDeletedLines.push(item);
+        }
+      });
+      self.xydata = afterDeletedLines;
+
+      self.graphicArr.forEach((item, index) => {
+        if (item.id !== `graphic_drag_${params.id}` && item.id !== `graphic_delete_${params.id}`) {
+          afterDeleteGraphic.push(item);
+        }
+      });
+      self.graphicArr = afterDeleteGraphic;
+      self.dataArr.splice(deleteNodeIndex, 1);
+
+      self.myChart.setOption({
+        series: [{
+          id: 'a',
+          edges: afterDeletedLines,
+          nodes: self.dataArr,
+        }],
+        graphic: [
+          {
+          id: `graphic_drag_${params.id}`,
+          $action: 'remove',
+        } , {
+          id: `graphic_delete_${params.id}`,
+          $action: 'remove',
+        }]
+      });
+      // self.initGraphic();
+      // self.refreshChart();
+      // self.bindingEvent();
+    });
   }
 
   getOption() {
@@ -423,7 +554,23 @@ export class DragFlowComponent implements OnInit {
     }
   }
 
-   private hasRelation(relation: number[]): boolean {
+  addNodes() {
+    this.operateMode = 'addNodes';
+  }
+
+  resetNodes() {
+    this.myChart.dispatchAction({
+      type: 'restore'
+    });
+    this.initGraphic();
+    this.bindingEvent();
+  }
+
+  clearOperateStatus() {
+    this.operateMode = 'none';
+  }
+
+   private hasRelation(relation: any[]): boolean {
       return this.xydata.some((item, index) => {
         return (item[0] === relation[0] && item[1] === relation[1]);
       });
