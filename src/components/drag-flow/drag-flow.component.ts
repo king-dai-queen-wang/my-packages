@@ -260,12 +260,14 @@ export class DragFlowComponent implements OnInit {
 
 // 重新定位图形元素
   updatePosition() {
+    let newPosition = echarts.util.map(this.dataArr, (item, dataIndex) => {
+      return {
+        position: this.myChart.convertToPixel('grid', item.value),
+      };
+    });
+    newPosition = newPosition.concat(newPosition);
     this.myChart.setOption({
-      graphic: echarts.util.map(this.dataArr, (item, dataIndex) => {
-        return {
-          position: this.myChart.convertToPixel('grid', item.value),
-        };
-      })
+      graphic: newPosition
     });
     // self.initGraphic();
     // self.bindingEvent();
@@ -274,14 +276,22 @@ export class DragFlowComponent implements OnInit {
 // 绘制图形元素
   initGraphic() {
     const res = [];
-    this.dataArr.map((item, dataIndex) => {
-      res.push(this.initGraphicDragBtnItem(item, dataIndex));
-      res.push(this.initGraphicDeleteBtnItem(item, dataIndex));
-      return res;
-    });
-    this.graphicArr = res;
+    // this.dataArr.map((item, dataIndex) => {
+    //   res.push(this.initGraphicDragBtnItem(item, dataIndex));
+    //   res.push(this.initGraphicDeleteBtnItem(item, dataIndex));
+    //   return res;
+    // });
+    // this.graphicArr = res;
+
     this.myChart.setOption({
-      graphic: res
+      graphic: echarts.util.map(this.dataArr, (item, dataIndex) => {
+        return this.initGraphicDeleteBtnItem(item, dataIndex);
+      })
+    });
+    this.myChart.setOption({
+      graphic: echarts.util.map(this.dataArr, (item, dataIndex) => {
+        return this.initGraphicDragBtnItem(item, dataIndex);
+      })
     });
   }
 
