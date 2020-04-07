@@ -55,9 +55,9 @@ export class DragFlowComponent implements OnInit {
   selectedNode = 0;
   position;
 // 起点
-  positionSource;
+  positionSource: number;
 // 钟点
-  positionTarget;
+  positionTarget: number;
 // 设置判断点击线还是点击点
 // 删除数组的索引位置
   del;
@@ -116,6 +116,7 @@ export class DragFlowComponent implements OnInit {
     // 画布监听click，增加节点
     zr.on('click', function (params) {
       if (typeof params.target === 'undefined') {
+        self.selectedNode = 0;
         // self.selectedNode = null;
       }
 
@@ -157,7 +158,7 @@ export class DragFlowComponent implements OnInit {
         name: `${xydata[i][0]} -> ${xydata[i][1]}`,
         source: xydata[i][0],
         target: xydata[i][1],
-        lineStyle: {normal: {}}
+        lineStyle: {curveness: 0.1}
       };
     });
 
@@ -247,13 +248,7 @@ export class DragFlowComponent implements OnInit {
         nodes: this.dataArr,
         // 指定连线方式
         edges: this.links,
-        // 指定连线颜色
-        lineStyle: {
-          curveness: 0.3,
-          normal: {
-            color: '#000'
-          }
-        },
+        cursor: 'pointer',
       }],
 
     };
@@ -435,10 +430,7 @@ export class DragFlowComponent implements OnInit {
                 edges: linkss,
                 // 指定连线颜色
                 lineStyle: {
-                  curveness: 0.3,
-                  normal: {
-                    color: '#123456'
-                  }
+                  curveness: 0.1
                 }
               }]
             });
@@ -456,14 +448,19 @@ export class DragFlowComponent implements OnInit {
   }
 
   onChartReady(myChart: echarts.ECharts) {
+    console.log('ready');
     this.myChart = myChart;
     // 在demo里，必须要加setTimeout ，否则执行 myChart.convertToPixel 会报错
     setTimeout(function() {
-      self.initGraphic();
-      self.bindingEvent();
-      // 窗口大小改事件
-      window.addEventListener('resize', self.updatePosition.bind(self));
+      self.initChart();
     }, 0);
+  }
+
+  initChart() {
+    self.initGraphic();
+    self.bindingEvent();
+    // 窗口大小改事件
+    window.addEventListener('resize', self.updatePosition.bind(self));
   }
 
   selectedNodes(node) {
@@ -507,7 +504,7 @@ export class DragFlowComponent implements OnInit {
             edges: linkss,
           }]
         });
-        return true;
+        // return true;
       }
     }
   }
@@ -519,10 +516,17 @@ export class DragFlowComponent implements OnInit {
       const afterDeleteGraphic = [];
       self.xydata.forEach((item, lindexIndex) => {
         if (!item.includes(params.id)) {
-          afterDeletedLines.push(item);
+          afterDeletedLines.push({
+            id: `edge_${item[0]}->${item[1]}`,
+            name: `${item[0]} -> ${item[1]}`,
+            source: item[0],
+            target:  item[1],
+            lineStyle: {
+              curveness: 0.1
+            }
+          });
         }
       });
-      self.xydata = afterDeletedLines;
 
       self.graphicArr.forEach((item, index) => {
         if (item.id !== `graphic_drag_${params.id}` && item.id !== `graphic_delete_${params.id}`) {
@@ -545,22 +549,23 @@ export class DragFlowComponent implements OnInit {
 
       self.myChart.setOption({
         series: [{
-          id: 'a',
           edges: afterDeletedLines,
         }]
       });
 
       self.myChart.setOption({
         series: [{
-          id: 'a',
           nodes: self.dataArr,
         }],
       });
 
-      console.log('delete over', self.myChart)
-      self.xydata.forEach((item, index) => {
-        self.initLinks(index);
-      });
+      console.log('delete over', self.myChart.getOption());
+      // setTimeout(() => {
+      //   self.xydata.forEach((item, index) => {
+      //     self.initLinks(index);
+      //   });
+      // }, 300);
+
 
       // self.initGraphic();
       // self.refreshChart();
@@ -589,8 +594,8 @@ export class DragFlowComponent implements OnInit {
     this.myChart.dispatchAction({
       type: 'restore'
     });
-    this.initGraphic();
-    this.bindingEvent();
+    // this.initGraphic();
+    // this.bindingEvent();
   }
 
   clearOperateStatus() {
