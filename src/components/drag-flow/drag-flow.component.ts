@@ -15,53 +15,24 @@ export class DragFlowComponent implements OnInit {
 // 点击连线，可以删除连线
 // 动态添加、删除节点 ，还未完成
 // 关系坐标
-  xydata = [
-    ['id-a', 'id-b'],
-    ['id-b', 'id-c'],
-    ['id-c', 'id-d']
-  ];
+  @Input() edges: any[];
 
 // 节点坐标
-  dataArr: {id: any, name: string, value: number[], itemStyle?: {color?: string}}[] = [
-    {
-      id: 'id-a',
-      name: 'A',
-      value: [115, 150],
-    },
-    {
-      id: 'id-b',
-      name: 'B',
-      value: [500, 10]
-    },
-    {
-      id: 'id-c',
-      name: 'C',
-      value: [55, 700]
-    },
-    {
-      id: 'id-d',
-      name: 'D',
-      value: [40, 40]
-    },
-  ];
-
-  graphicArr = [];
-
+  @Input() nodes: {id: any, name: string, value: number[], itemStyle?: {color?: string}}[];
+  private graphicArr: any[] = [];
   gridOffset: 10;
 // 设置点的大小
   symbolSize = [100, 70];
 
 // 当0时候表示输入起点坐标，其他值输入终点坐标
-  selectedNodeStep: SelectedTypeEnum = SelectedTypeEnum.NONE;
+  private selectedNodeStep: SelectedTypeEnum = SelectedTypeEnum.NONE;
   position;
 // 起点
-  selectedSourceNodeIndex: number;
+  private selectedSourceNodeIndex: number;
 // 钟点
-  selectedTargetNodeIndex: number;
+  private selectedTargetNodeIndex: number;
 // 设置判断点击线还是点击点
 // 删除数组的索引位置
-  del;
-  links;
   option;
   myChart;
   constructor() { }
@@ -86,7 +57,7 @@ export class DragFlowComponent implements OnInit {
       if (params.dataType !== 'node') {
         return;
       }
-      console.log('click nodes', params);
+      console.log('click nodes', params, self.selectedSourceNodeIndex, self.selectedTargetNodeIndex);
       self.selectedNodes(params);
       self.initLinks(params.dataIndex);
     });
@@ -119,7 +90,7 @@ export class DragFlowComponent implements OnInit {
       self.confirmDialog('确认添加吗', () => {
         if (self.myChart.containPixel('grid', pointInPixel)) {
           const id = 'E'+ Math.random();
-          self.dataArr.push({name: id, id, value: pointInGrid});
+          self.nodes.push({name: id, id, value: pointInGrid});
           self.initGraphic();
           self.setNodes();
           self.clearOperateStatus();
@@ -141,13 +112,13 @@ export class DragFlowComponent implements OnInit {
   }
 
   initOption() {
-    const xydata = this.xydata;
-    this.links = this.xydata.map(function(item, i) {
+    const edges = this.edges;
+    const links = this.edges.map(function(item, i) {
       return {
-        id: `edge_${xydata[i][0]}->${xydata[i][1]}`,
-        name: `${xydata[i][0]} -> ${xydata[i][1]}`,
-        source: xydata[i][0],
-        target: xydata[i][1],
+        id: `edge_${edges[i][0]}->${edges[i][1]}`,
+        name: `${edges[i][0]} -> ${edges[i][1]}`,
+        source: edges[i][0],
+        target: edges[i][1],
         lineStyle: {curveness: 0.1}
       };
     });
@@ -222,7 +193,7 @@ export class DragFlowComponent implements OnInit {
         label: {
           show: true,
           formatter: (d, i) => {
-            return this.dataArr[d.dataIndex] && this.dataArr[d.dataIndex].name;
+            return this.nodes[d.dataIndex] && this.nodes[d.dataIndex].name;
           },
           color: '#000',
         },
@@ -235,9 +206,9 @@ export class DragFlowComponent implements OnInit {
         edgeSymbol: ['circle', 'arrow'],
         edgeSymbolSize: [4, 20],
         // 指定数据数组
-        nodes: this.dataArr,
+        nodes: this.nodes,
         // 指定连线方式
-        edges: this.links,
+        edges: links,
         cursor: 'pointer',
       }],
 
@@ -246,7 +217,7 @@ export class DragFlowComponent implements OnInit {
 
 // 重新定位图形元素
   updatePosition() {
-    let newPosition = echarts.util.map(this.dataArr, (item, dataIndex) => {
+    let newPosition = echarts.util.map(this.nodes, (item, dataIndex) => {
       return {
         position: this.myChart.convertToPixel('grid', item.value),
       };
@@ -261,12 +232,12 @@ export class DragFlowComponent implements OnInit {
   initGraphic() {
     const res = [];
     this.myChart.setOption({
-      graphic: echarts.util.map(this.dataArr, (item, dataIndex) => {
+      graphic: echarts.util.map(this.nodes, (item, dataIndex) => {
         return this.initGraphicDeleteBtnItem(item, dataIndex);
       })
     });
     this.myChart.setOption({
-      graphic: echarts.util.map(this.dataArr, (item, dataIndex) => {
+      graphic: echarts.util.map(this.nodes, (item, dataIndex) => {
         return this.initGraphicDragBtnItem(item, dataIndex);
       })
     });
@@ -338,7 +309,7 @@ export class DragFlowComponent implements OnInit {
     this.myChart.setOption({
       series: [{
         id: 'a',
-        nodes: this.dataArr
+        nodes: this.nodes
       }]
     });
   }
@@ -357,12 +328,12 @@ export class DragFlowComponent implements OnInit {
     if (this.position[1] >= self.myChart.getHeight()) {
       this.position[1] = self.myChart.getHeight();
     }
-    self.dataArr[dataIndex].value = self.myChart.convertFromPixel('grid', this.position);
+    self.nodes[dataIndex].value = self.myChart.convertFromPixel('grid', this.position);
     // Update nodes
     self.myChart.setOption({
       series: [{
         id: 'a',
-        nodes: self.dataArr
+        nodes: self.nodes
       }]
     });
     self.initGraphic();
@@ -371,7 +342,7 @@ export class DragFlowComponent implements OnInit {
 
 // 绘制添加的连线
   initLinks = (dataIndex) => {
-    for (let i = 0; i < this.dataArr.length; i++) {
+    for (let i = 0; i < this.nodes.length; i++) {
       if (i === dataIndex) {
         if (this.selectedNodeStep === SelectedTypeEnum.NONE) {
           this.selectedSourceNodeIndex = i;
@@ -382,12 +353,12 @@ export class DragFlowComponent implements OnInit {
           if (this.selectedTargetNodeIndex === this.selectedSourceNodeIndex) {
             return;
           }
-          self.confirmDialog('是否建立链接', () => {
-            if (!this.hasRelation([this.dataArr[this.selectedSourceNodeIndex].id, this.dataArr[this.selectedTargetNodeIndex].id])) {
-              this.xydata.push([this.dataArr[this.selectedSourceNodeIndex].id, this.dataArr[this.selectedTargetNodeIndex].id]);
+          if (!this.hasRelation([this.nodes[this.selectedSourceNodeIndex].id, this.nodes[this.selectedTargetNodeIndex].id])) {
+            self.confirmDialog('是否建立链接', () => {
+              this.edges.push([this.nodes[this.selectedSourceNodeIndex].id, this.nodes[this.selectedTargetNodeIndex].id]);
               // 当xydata值改变时linkss方法需要重新跑一变
-              const xyData = this.xydata;
-              const linkss = this.xydata.map(function(item, i) {
+              const xyData = this.edges;
+              const linkss = this.edges.map(function(item, i) {
                 return {
                   source: xyData[i][0],
                   target: xyData[i][1]
@@ -403,10 +374,11 @@ export class DragFlowComponent implements OnInit {
                   }
                 }]
               });
-            }
-            self.clearNodeColors();
-          });
+            });
 
+          }
+
+          self.clearNodeColors();
           // return true;
         }
         break;
@@ -432,13 +404,12 @@ export class DragFlowComponent implements OnInit {
   }
 
   selectedNodes(node) {
-    console.log(node);
     self.toggleNodeColor(node, self.selectedSourceNodeColor);
 
   }
 
   toggleNodeColor(node, color) {
-    self.dataArr.forEach(item => {
+    self.nodes.forEach(item => {
       if (item.id === node.data.id) {
         if (item.itemStyle && item.itemStyle.color === color) {
           delete item.itemStyle;
@@ -451,22 +422,20 @@ export class DragFlowComponent implements OnInit {
     });
     self.myChart.setOption({
       series: [{
-        id: 'a',
-        type: 'graph',
-        nodes: self.dataArr
+        nodes: self.nodes
       }]
     });
   }
 
   clearNodeColors() {
-    this.dataArr.forEach(item => {
+    this.nodes.forEach(item => {
       delete item.itemStyle;
     });
     self.myChart.setOption({
       series: [{
         id: 'a',
         type: 'graph',
-        nodes: self.dataArr
+        nodes: self.nodes
       }]
     });
   }
@@ -488,15 +457,14 @@ export class DragFlowComponent implements OnInit {
 
   deleteLine(params) {
     const a = [params.data.source, params.data.target];
-    for (let i = 0; i < self.xydata.length; i++) {
-      if (params.data.source === self.xydata[i][0] && params.data.target === self.xydata[i][1]) {
-        self.del = i;
-        self.xydata.splice(self.del, 1);
+    for (let i = 0; i < self.edges.length; i++) {
+      if (params.data.source === self.edges[i][0] && params.data.target === self.edges[i][1]) {
+        self.edges.splice(i, 1);
         // 当xydata值改变时linkss方法需要重新跑一变
-        const linkss = self.xydata.map(function(item, i) {
+        const linkss = self.edges.map(function(item, i) {
           return {
-            source: self.xydata[i][0],
-            target: self.xydata[i][1]
+            source: self.edges[i][0],
+            target: self.edges[i][1]
           };
         });
         // 重新载入的东西都写在这里
@@ -512,10 +480,10 @@ export class DragFlowComponent implements OnInit {
 
   deleteNode(params, deleteNodeIndex) {
     console.log('delete node', params);
-    self.confirmDialog('确认删除节点吗' + params.name,() => {
+    this.confirmDialog('确认删除节点吗' + params.name,() => {
       const afterDeletedLines = [];
       const afterDeleteGraphic = [];
-      self.xydata.forEach((item, lindexIndex) => {
+      this.edges.forEach((item, lindexIndex) => {
         if (!item.includes(params.id)) {
           afterDeletedLines.push({
             id: `edge_${item[0]}->${item[1]}`,
@@ -528,16 +496,19 @@ export class DragFlowComponent implements OnInit {
           });
         }
       });
-
-      self.graphicArr.forEach((item, index) => {
+      this.graphicArr.forEach((item, index) => {
         if (item.id !== `graphic_drag_${params.id}` && item.id !== `graphic_delete_${params.id}`) {
           afterDeleteGraphic.push(item);
         }
       });
-      self.graphicArr = afterDeleteGraphic;
-      self.dataArr.splice(deleteNodeIndex, 1);
+      this.graphicArr = afterDeleteGraphic;
+      this.nodes.splice(deleteNodeIndex, 1);
 
-      self.myChart.setOption({
+      this.myChart.setOption({
+        series: [{
+          nodes: this.nodes,
+          edges: afterDeletedLines,
+        }],
         graphic: [
           {
             id: `graphic_drag_${params.id}`,
@@ -547,35 +518,12 @@ export class DragFlowComponent implements OnInit {
             $action: 'remove',
           }]
       });
-
-      self.myChart.setOption({
-        series: [{
-          edges: afterDeletedLines,
-        }]
-      });
-
-      self.myChart.setOption({
-        series: [{
-          nodes: self.dataArr,
-        }],
-      });
-
-      console.log('delete over', self.myChart.getOption());
-      // setTimeout(() => {
-      //   self.xydata.forEach((item, index) => {
-      //     self.initLinks(index);
-      //   });
-      // }, 300);
-
-
-      // self.initGraphic();
-      // self.refreshChart();
-      // self.bindingEvent();
+      this.resetNodes();
     });
   }
 
   getOption() {
-    console.log(this.myChart.getOption());
+    console.log(this.myChart.getOption(), this.selectedSourceNodeIndex, this.selectedTargetNodeIndex);
   }
 
   confirmDialog(confirmMsg, confirmFn?, cancelFn?) {
@@ -595,7 +543,7 @@ export class DragFlowComponent implements OnInit {
     this.myChart.dispatchAction({
       type: 'restore'
     });
-    // this.initGraphic();
+    this.initGraphic();
     // this.bindingEvent();
   }
 
@@ -604,7 +552,7 @@ export class DragFlowComponent implements OnInit {
   }
 
    private hasRelation(relation: any[]): boolean {
-      return this.xydata.some((item, index) => {
+      return this.edges.some((item, index) => {
         return (item[0] === relation[0] && item[1] === relation[1]);
       });
    }
