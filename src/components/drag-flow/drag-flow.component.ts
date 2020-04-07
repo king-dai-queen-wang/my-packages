@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import * as echarts from 'echarts';
+import { SelectedTypeEnum } from './selected-type.enum';
 let self;
 @Component({
   selector: 'dww-drag-flow',
@@ -8,8 +9,7 @@ let self;
 })
 export class DragFlowComponent implements OnInit {
   @Input() operateMode: 'deleteNodes' | 'addNodes' | 'none' = 'none';
-  currentSelectedNode;
-  //
+  @Input() selectedSourceNodeColor: string = 'red';
 // 节点可拖动
 // 前后点击两个节点，可以对节点进行连接
 // 点击连线，可以删除连线
@@ -22,7 +22,7 @@ export class DragFlowComponent implements OnInit {
   ];
 
 // 节点坐标
-  dataArr = [
+  dataArr: {id: any, name: string, value: number[], itemStyle?: {color?: string}}[] = [
     {
       id: 'id-a',
       name: 'A',
@@ -52,12 +52,12 @@ export class DragFlowComponent implements OnInit {
   symbolSize = [100, 70];
 
 // 当0时候表示输入起点坐标，其他值输入终点坐标
-  selectedNode = 0;
+  selectedNodeStep: SelectedTypeEnum = SelectedTypeEnum.NONE;
   position;
 // 起点
-  positionSource: number;
+  selectedSourceNodeIndex: number;
 // 钟点
-  positionTarget: number;
+  selectedTargetNodeIndex: number;
 // 设置判断点击线还是点击点
 // 删除数组的索引位置
   del;
@@ -73,13 +73,6 @@ export class DragFlowComponent implements OnInit {
 
   bindingEvent() {
     const zr = this.myChart.getZr();
-    // this.myChart.on('click', function(params) {
-    //   console.log(params);
-    //   if (params.componentType === 'graph') {
-    //     console.log('click graph', params)
-    //   }
-    // });
-
     // 点击事件 , 删除连线
     this.myChart.on('click', {dataType: 'edge'}, function (params) {
       if (params.dataType !== 'edge') {
@@ -96,9 +89,6 @@ export class DragFlowComponent implements OnInit {
       console.log('click nodes', params);
       self.selectedNodes(params);
       self.initLinks(params.dataIndex);
-      // onclick: echarts.util.curry(this.initLinks, dataIndex),
-      //   onmousemove: echarts.util.curry(this.showTooltip.bind(self), dataIndex),
-      //   onmouseout: echarts.util.curry(this.hideTooltip.bind(self), dataIndex),
     });
 
     this.myChart.on('mousemove', {dataType: 'node'}, function (params) {
@@ -116,8 +106,8 @@ export class DragFlowComponent implements OnInit {
     // 画布监听click，增加节点
     zr.on('click', function (params) {
       if (typeof params.target === 'undefined') {
-        self.selectedNode = 0;
-        // self.selectedNode = null;
+        self.clearNodeColors();
+        self.selectedNodeStep = SelectedTypeEnum.NONE;
       }
 
       if (typeof params.target !== 'undefined' || self.operateMode !== 'addNodes') {
@@ -265,20 +255,11 @@ export class DragFlowComponent implements OnInit {
     this.myChart.setOption({
       graphic: newPosition
     });
-    // self.initGraphic();
-    // self.bindingEvent();
   }
 
 // 绘制图形元素
   initGraphic() {
     const res = [];
-    // this.dataArr.map((item, dataIndex) => {
-    //   res.push(this.initGraphicDragBtnItem(item, dataIndex));
-    //   res.push(this.initGraphicDeleteBtnItem(item, dataIndex));
-    //   return res;
-    // });
-    // this.graphicArr = res;
-
     this.myChart.setOption({
       graphic: echarts.util.map(this.dataArr, (item, dataIndex) => {
         return this.initGraphicDeleteBtnItem(item, dataIndex);
@@ -361,19 +342,6 @@ export class DragFlowComponent implements OnInit {
       }]
     });
   }
-  // showTooltip(dataIndex) {
-  //   this.myChart.dispatchAction({
-  //     type: 'showTip',
-  //     seriesIndex: 0,
-  //     dataIndex: dataIndex
-  //   });
-  // }
-
-  // hideTooltip(dataIndex) {
-  //   this.myChart.dispatchAction({
-  //     type: 'hideTip'
-  //   });
-  // }
 // 图形元素拖动后， 修改节点位置
   onPointDragging(dataIndex, dx, dy) {
     if (this.position[0] <= 0) {
@@ -405,41 +373,41 @@ export class DragFlowComponent implements OnInit {
   initLinks = (dataIndex) => {
     for (let i = 0; i < this.dataArr.length; i++) {
       if (i === dataIndex) {
-        if (this.selectedNode === 0) {
-          this.positionSource = i;
-          this.selectedNode = 1;
-        } else {
-          // if (this.selectedNode === null) {
-          //   return;
-          // }
-          this.positionTarget = i;
-          this.selectedNode = 0;
-          if (!this.hasRelation([this.dataArr[this.positionSource].id, this.dataArr[this.positionTarget].id])) {
-            this.xydata.push([this.dataArr[this.positionSource].id, this.dataArr[this.positionTarget].id]);
-            // 当xydata值改变时linkss方法需要重新跑一变
-            const xyData = this.xydata;
-            const linkss = this.xydata.map(function(item, i) {
-              return {
-                source: xyData[i][0],
-                target: xyData[i][1]
-              };
-            });
-            // 重新载入的东西都写在这里
-            this.myChart.setOption({
-              series: [{
-                edges: linkss,
-                // 指定连线颜色
-                lineStyle: {
-                  curveness: 0.1
-                }
-              }]
-            });
-            // self.selectedNode = null;
-            // self.positionSource = null;
-            // self.positionTarget = null;
-          //  清空选择的node
+        if (this.selectedNodeStep === SelectedTypeEnum.NONE) {
+          this.selectedSourceNodeIndex = i;
+          this.selectedNodeStep = SelectedTypeEnum.SELECTED;
+        } else if (this.selectedNodeStep === SelectedTypeEnum.SELECTED) {
+          this.selectedTargetNodeIndex = i;
+          this.selectedNodeStep = SelectedTypeEnum.NONE;
+          if (this.selectedTargetNodeIndex === this.selectedSourceNodeIndex) {
+            return;
           }
-          return true;
+          self.confirmDialog('是否建立链接', () => {
+            if (!this.hasRelation([this.dataArr[this.selectedSourceNodeIndex].id, this.dataArr[this.selectedTargetNodeIndex].id])) {
+              this.xydata.push([this.dataArr[this.selectedSourceNodeIndex].id, this.dataArr[this.selectedTargetNodeIndex].id]);
+              // 当xydata值改变时linkss方法需要重新跑一变
+              const xyData = this.xydata;
+              const linkss = this.xydata.map(function(item, i) {
+                return {
+                  source: xyData[i][0],
+                  target: xyData[i][1]
+                };
+              });
+              // 重新载入的东西都写在这里
+              this.myChart.setOption({
+                series: [{
+                  edges: linkss,
+                  // 指定连线颜色
+                  lineStyle: {
+                    curveness: 0.1
+                  }
+                }]
+              });
+            }
+            self.clearNodeColors();
+          });
+
+          // return true;
         }
         break;
       }
@@ -464,10 +432,43 @@ export class DragFlowComponent implements OnInit {
   }
 
   selectedNodes(node) {
-    // this.myChart.dispatchAction({
-    //   type: 'focusNodeAdjacency',
-    //   dataIndex,
-    // });
+    console.log(node);
+    self.toggleNodeColor(node, self.selectedSourceNodeColor);
+
+  }
+
+  toggleNodeColor(node, color) {
+    self.dataArr.forEach(item => {
+      if (item.id === node.data.id) {
+        if (item.itemStyle && item.itemStyle.color === color) {
+          delete item.itemStyle;
+        } else {
+          item.itemStyle = {
+            color
+          };
+        }
+      }
+    });
+    self.myChart.setOption({
+      series: [{
+        id: 'a',
+        type: 'graph',
+        nodes: self.dataArr
+      }]
+    });
+  }
+
+  clearNodeColors() {
+    this.dataArr.forEach(item => {
+      delete item.itemStyle;
+    });
+    self.myChart.setOption({
+      series: [{
+        id: 'a',
+        type: 'graph',
+        nodes: self.dataArr
+      }]
+    });
   }
 
   focusNodes(dataIndex: number) {
