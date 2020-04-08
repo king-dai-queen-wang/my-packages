@@ -1,126 +1,79 @@
 import {Component, Input, OnInit} from '@angular/core';
 import * as echarts from 'echarts';
-import { SelectedTypeEnum } from './selected-type.enum';
+import {SelectedTypeEnum} from './selected-type.enum';
+
 let self;
+
 @Component({
   selector: 'dww-drag-flow',
   templateUrl: './drag-flow.component.html',
   styleUrls: ['./drag-flow.component.scss']
 })
 export class DragFlowComponent implements OnInit {
+  // 操作模式，只有addNodes有用
   @Input() operateMode: 'deleteNodes' | 'addNodes' | 'none' = 'none';
-  @Input() selectedSourceNodeColor: string = 'red';
-// 节点可拖动
-// 前后点击两个节点，可以对节点进行连接
-// 点击连线，可以删除连线
-// 动态添加、删除节点 ，还未完成
-// 关系坐标
+  // 选中node时候的颜色
+  @Input() selectedSourceNodeColor = 'red';
+  // 关系坐标
   @Input() edges: any[];
-
-// 节点坐标
-  @Input() nodes: {id: any, name: string, value: number[], itemStyle?: {color?: string}}[];
+  // 节点坐标
+  @Input() nodes: { id: any, name: string, value: number[], itemStyle?: { color?: string } }[];
+  private lineStyle = {
+    curveness: 0.1,
+    color: '#9EADD6',
+    // normal: {
+    //   color: '#9EADD6',
+    //   width: 1,
+    // }
+  };
+  // 节点可拖动
+  // 前后点击两个节点，可以对节点进行连接
   private graphicArr: any[] = [];
+  // grid 偏移量
   gridOffset: 10;
-// 设置点的大小
+  // 设置点的大小
   symbolSize = [100, 70];
 
-// 当0时候表示输入起点坐标，其他值输入终点坐标
+  // 当0时候表示输入起点坐标，其他值输入终点坐标
   private selectedNodeStep: SelectedTypeEnum = SelectedTypeEnum.NONE;
+  // 只为了tslint不报错，this.position
   position;
-// 起点
-  private selectedSourceNodeIndex: number;
-// 钟点
-  private selectedTargetNodeIndex: number;
-// 设置判断点击线还是点击点
-// 删除数组的索引位置
+  // 起点index
+  private selectedSourceNodeIndex: number = null;
+  // 钟点index
+  private selectedTargetNodeIndex: number = null;
   option;
   myChart;
-  constructor() { }
+
+  constructor() {
+  }
 
   ngOnInit() {
     this.initOption();
     self = this;
   }
 
-  bindingEvent() {
-    const zr = this.myChart.getZr();
-
-    // 画布监听click，增加节点
-    zr.on('click', function (params) {
-      if (typeof params.target === 'undefined') {
-        self.clearNodeColors();
-        self.selectedNodeStep = SelectedTypeEnum.NONE;
-        self.selectedSourceNodeIndex = null;
-        self.selectedTargetNodeIndex = null;
-        return;
-      }
-
-      if (typeof params.target !== 'undefined' || self.operateMode !== 'addNodes') {
-        return;
-      }
-      const pointInPixel = [params.offsetX, params.offsetY];
-      const pointInGrid = self.myChart.convertFromPixel('grid', pointInPixel);
-
-      self.confirmDialog('确认添加吗', () => {
-        if (self.myChart.containPixel('grid', pointInPixel)) {
-          const id = 'E'+ Math.random();
-          self.nodes.push({name: id, id, value: pointInGrid});
-          self.initGraphic();
-          self.setNodes();
-          self.clearOperateStatus();
-        }
-      });
-
-    });
-
-    zr.on('mousemove', function (params) {
-      zr.setCursorStyle('default');
-      const pointInPixel = [params.offsetX, params.offsetY];
-      if (self.myChart.containPixel('grid', pointInPixel)) {
-        if (self.operateMode === 'addNodes') {
-          zr.setCursorStyle('copy');
-        }
-      }
-    });
-    // 点击事件 , 删除连线
-    this.myChart.on('click', {dataType: 'edge'}, function (params) {
-      if (params.dataType !== 'edge') {
-        return;
-      }
-      self.confirmDialog('确认删除连线吗', self.deleteLine.bind(self, params), () => {});
-      return;
-    });
-
-    this.myChart.on('click', {dataType: 'node'}, function (params) {
-      if (params.dataType !== 'node') {
-        return;
-      }
-      self.selectedNodes(params);
-      self.initLinks(params);
-      console.log('click nodes', params, self.selectedSourceNodeIndex, self.selectedTargetNodeIndex);
-    });
-
-    this.myChart.on('mousemove', {dataType: 'node'}, function (params) {
-      self.focusNodes(params.dataIndex);
-    });
-
-    this.myChart.on('mouseout', {dataType: 'node'}, function (params) {
-      self.unFocusNodes(params.dataIndex);
-    });
-
-    this.myChart.on('dataZoom', self.updatePosition.bind(self));
-
+  initChart() {
+    self.initGraphic();
+    self.bindingEvent();
+    // 窗口大小改事件
+    window.addEventListener('resize', self.updatePosition.bind(self));
   }
 
-  initOption() {
+  getOption() {
+    console.log(this.myChart.getOption(), this.selectedSourceNodeIndex, this.selectedTargetNodeIndex);
+  }
+
+  private initOption() {
     const edges = this.edges;
+    const lineStyle = this.lineStyle;
     const links = this.edges.map(function(item, i) {
       return {
         id: `edge_${edges[i][0]}->${edges[i][1]}`,
         name: `${edges[i][0]} -> ${edges[i][1]}`,
         source: edges[i][0],
         target: edges[i][1],
-        lineStyle: {curveness: 0.1}
+        lineStyle
       };
     });
 
@@ -134,8 +87,7 @@ export class DragFlowComponent implements OnInit {
         top: this.gridOffset,
         bottom: this.gridOffset
       },
-      tooltip: {
-      },
+      tooltip: {},
       // 定义X轴
       xAxis: {
         min: 0,
@@ -146,7 +98,7 @@ export class DragFlowComponent implements OnInit {
           onZero: false
         },
         axisLabel: {show: false, inside: true},
-        splitArea : {show : false},
+        splitArea: {show: false},
         splitNumber: 10,
         scale: true,
         show: true
@@ -161,26 +113,26 @@ export class DragFlowComponent implements OnInit {
           onZero: true
         },
         axisLabel: {show: false, inside: false},
-        splitArea : {show : false},
+        splitArea: {show: false},
         splitNumber: 10,
         show: true
       },
       dataZoom: [
         {
-        show: true,
-        type: 'inside',
-        filterMode: 'none',
-        xAxisIndex: [0],
-        startValue: -500,
-        endValue: 500
-      }, {
-        show: true,
-        type: 'inside',
-        filterMode: 'none',
-        yAxisIndex: [0],
-        startValue: -500,
-        endValue: 500
-      }],
+          show: true,
+          type: 'inside',
+          filterMode: 'none',
+          xAxisIndex: [0],
+          startValue: -500,
+          endValue: 500
+        }, {
+          show: true,
+          type: 'inside',
+          filterMode: 'none',
+          yAxisIndex: [0],
+          startValue: -500,
+          endValue: 500
+        }],
       series: [{
         // 设置id很重要
         id: 'a',
@@ -191,6 +143,8 @@ export class DragFlowComponent implements OnInit {
         // 设置球的大小
         symbolSize: this.symbolSize,
         symbol: 'roundRect',
+        roam: true,
+        focusNodeAdjacency: true,
         label: {
           show: true,
           formatter: (d, i) => {
@@ -215,9 +169,77 @@ export class DragFlowComponent implements OnInit {
 
     };
   }
+// 綁定事件
+  private bindingEvent() {
+    const zr = this.myChart.getZr();
 
+    // 画布监听click，增加节点
+    zr.on('click', function(params) {
+      if (self.operateMode === 'addNodes') {
+        const pointInPixel = [params.offsetX, params.offsetY];
+        const pointInGrid = self.myChart.convertFromPixel('grid', pointInPixel);
+
+        self.confirmDialog('确认添加吗', () => {
+          if (self.myChart.containPixel('grid', pointInPixel)) {
+            const id = 'E' + Math.random();
+            self.nodes.push({name: id, id, value: pointInGrid});
+            self.initGraphic();
+            self.setNodes();
+            self.clearOperateStatus();
+          }
+        });
+        return;
+      }
+      if (self.operateMode !== 'addNodes' && typeof params.target === 'undefined') {
+        self.clearNodeColors();
+        self.selectedNodeStep = SelectedTypeEnum.NONE;
+        self.selectedSourceNodeIndex = null;
+        self.selectedTargetNodeIndex = null;
+        return;
+      }
+    });
+    // set鼠標yang'shi
+    zr.on('mousemove', function(params) {
+      zr.setCursorStyle('default');
+      const pointInPixel = [params.offsetX, params.offsetY];
+      if (self.myChart.containPixel('grid', pointInPixel)) {
+        if (self.operateMode === 'addNodes') {
+          zr.setCursorStyle('copy');
+        }
+      }
+    });
+    // 点击link事件 , 删除连线
+    this.myChart.on('click', {dataType: 'edge'}, function(params) {
+      if (params.dataType !== 'edge') {
+        return;
+      }
+      self.confirmDialog('确认删除连线吗', self.deleteLine.bind(self, params), () => {
+      });
+      return;
+    });
+    // 点击node
+    this.myChart.on('click', {dataType: 'node'}, function(params) {
+      if (params.dataType !== 'node') {
+        return;
+      }
+      // self.selectedNodes(params);
+      self.initLinks(params);
+      console.log('click nodes', params, self.selectedSourceNodeIndex, self.selectedTargetNodeIndex);
+    });
+
+    this.myChart.on('mousemove', {dataType: 'node'}, function(params) {
+      // self.focusNodes(params.dataIndex);
+    });
+
+    this.myChart.on('mouseout', {dataType: 'node'}, function(params) {
+      // self.unFocusNodes(params.dataIndex);
+    });
+
+    this.myChart.on('dataZoom', self.updatePosition.bind(self));
+
+  }
 // 重新定位图形元素
-  updatePosition() {
+  private updatePosition() {
     let newPosition = echarts.util.map(this.nodes, (item, dataIndex) => {
       return {
         position: this.myChart.convertToPixel('grid', item.value),
@@ -230,7 +252,7 @@ export class DragFlowComponent implements OnInit {
   }
 
 // 绘制图形元素
-  initGraphic() {
+  private initGraphic() {
     const res = [];
     this.myChart.setOption({
       graphic: echarts.util.map(this.nodes, (item, dataIndex) => {
@@ -244,7 +266,7 @@ export class DragFlowComponent implements OnInit {
     });
   }
 
-  initGraphicDragBtnItem(item, dataIndex) {
+  private initGraphicDragBtnItem(item, dataIndex) {
     return {
       id: `graphic_drag_${item.id}`,
       // 矩形
@@ -259,7 +281,7 @@ export class DragFlowComponent implements OnInit {
         height: this.symbolSize[1] / 2
       },
       style: {
-        fill : '#3FA7DC50',
+        fill: '#3FA7DC50',
         lineWidth: 2,
         borderColor: '#22faf7',
         borderWidth: 1,
@@ -274,7 +296,8 @@ export class DragFlowComponent implements OnInit {
       z: 3
     };
   }
-  initGraphicDeleteBtnItem(item, dataIndex) {
+
+  private initGraphicDeleteBtnItem(item, dataIndex) {
     return {
       id: `graphic_delete_${item.id}`,
       // 矩形
@@ -288,7 +311,7 @@ export class DragFlowComponent implements OnInit {
       },
       style: {
         image: 'https://iknowpc.bdimg.com/static/common/widget/search-box-new/img/logo-new.aff256e.png',
-        fill : '#ddd',
+        fill: '#ddd',
         width: 30,
         height: 30,
         lineWidth: 2,
@@ -306,7 +329,8 @@ export class DragFlowComponent implements OnInit {
       z: 3
     };
   }
-  setNodes() {
+
+  private setNodes() {
     this.myChart.setOption({
       series: [{
         id: 'a',
@@ -314,8 +338,9 @@ export class DragFlowComponent implements OnInit {
       }]
     });
   }
+
 // 图形元素拖动后， 修改节点位置
-  onPointDragging(dataIndex, dx, dy) {
+  private onPointDragging(dataIndex, dx, dy) {
     if (this.position[0] <= 0) {
       this.position[0] = (self.symbolSize[0] / 2);
     }
@@ -342,7 +367,7 @@ export class DragFlowComponent implements OnInit {
   }
 
 // 绘制添加的连线
-  initLinks = (node) => {
+  private initLinks(node) {
     const {dataIndex} = node;
     for (let i = 0; i < this.nodes.length; i++) {
       if (i === dataIndex) {
@@ -374,9 +399,7 @@ export class DragFlowComponent implements OnInit {
                 series: [{
                   edges: linkss,
                   // 指定连线颜色
-                  lineStyle: {
-                    curveness: 0.1
-                  }
+                  lineStyle: self.lineStyle
                 }]
               });
 
@@ -397,7 +420,7 @@ export class DragFlowComponent implements OnInit {
     }
   }
 
-  onChartReady(myChart: echarts.ECharts) {
+  private onChartReady(myChart: echarts.ECharts) {
     console.log('ready');
     this.myChart = myChart;
     // 在demo里，必须要加setTimeout ，否则执行 myChart.convertToPixel 会报错
@@ -406,19 +429,10 @@ export class DragFlowComponent implements OnInit {
     }, 0);
   }
 
-  initChart() {
-    self.initGraphic();
-    self.bindingEvent();
-    // 窗口大小改事件
-    window.addEventListener('resize', self.updatePosition.bind(self));
+  private selectedNodes(node) {
   }
 
-  selectedNodes(node) {
-
-
-  }
-
-  toggleNodeColor(node, color) {
+  private toggleNodeColor(node, color) {
     self.nodes.forEach(item => {
       if (item.id === node.data.id) {
         if (item.itemStyle && item.itemStyle.color === color) {
@@ -437,7 +451,7 @@ export class DragFlowComponent implements OnInit {
     });
   }
 
-  clearNodeColors() {
+  private clearNodeColors() {
     this.nodes.forEach(item => {
       delete item.itemStyle;
     });
@@ -450,22 +464,21 @@ export class DragFlowComponent implements OnInit {
     });
   }
 
-  focusNodes(dataIndex: number) {
+  private focusNodes(dataIndex: number) {
     this.myChart.dispatchAction({
       type: 'focusNodeAdjacency',
       dataIndex,
     });
   }
 
-  unFocusNodes(dataIndex: number) {
+  private unFocusNodes(dataIndex: number) {
     this.myChart.dispatchAction({
       type: 'unfocusNodeAdjacency',
       dataIndex,
     });
   }
 
-
-  deleteLine(params) {
+  private deleteLine(params) {
     const a = [params.data.source, params.data.target];
     for (let i = 0; i < self.edges.length; i++) {
       if (params.data.source === self.edges[i][0] && params.data.target === self.edges[i][1]) {
@@ -488,9 +501,9 @@ export class DragFlowComponent implements OnInit {
     }
   }
 
-  deleteNode(params, deleteNodeIndex) {
+  private deleteNode(params, deleteNodeIndex) {
     console.log('delete node', params);
-    this.confirmDialog('确认删除节点吗' + params.name,() => {
+    this.confirmDialog('确认删除节点吗' + params.name, () => {
       const afterDeletedLines = [];
       const afterDeleteGraphic = [];
       this.edges.forEach((item, lindexIndex) => {
@@ -499,10 +512,8 @@ export class DragFlowComponent implements OnInit {
             id: `edge_${item[0]}->${item[1]}`,
             name: `${item[0]} -> ${item[1]}`,
             source: item[0],
-            target:  item[1],
-            lineStyle: {
-              curveness: 0.1
-            }
+            target: item[1],
+            lineStyle: self.lineStyle
           });
         }
       });
@@ -523,7 +534,7 @@ export class DragFlowComponent implements OnInit {
           {
             id: `graphic_drag_${params.id}`,
             $action: 'remove',
-          } , {
+          }, {
             id: `graphic_delete_${params.id}`,
             $action: 'remove',
           }]
@@ -532,20 +543,18 @@ export class DragFlowComponent implements OnInit {
     });
   }
 
-  getOption() {
-    console.log(this.myChart.getOption(), this.selectedSourceNodeIndex, this.selectedTargetNodeIndex);
-  }
-
-  confirmDialog(confirmMsg, confirmFn?, cancelFn?) {
+  private confirmDialog(confirmMsg, confirmFn?, cancelFn?) {
     const r = confirm(confirmMsg);
     if (r) {
+      // tslint:disable-next-line:no-unused-expression
       confirmFn && confirmFn();
     } else {
+      // tslint:disable-next-line:no-unused-expression
       cancelFn && cancelFn();
     }
   }
 
-  addNodes() {
+  private addNodes() {
     this.operateMode = 'addNodes';
   }
 
@@ -554,16 +563,15 @@ export class DragFlowComponent implements OnInit {
       type: 'restore'
     });
     this.initGraphic();
-    // this.bindingEvent();
   }
 
-  clearOperateStatus() {
+  private clearOperateStatus() {
     this.operateMode = 'none';
   }
 
-   private hasRelation(relation: any[]): boolean {
-      return this.edges.some((item, index) => {
-        return (item[0] === relation[0] && item[1] === relation[1]);
-      });
-   }
+  private hasRelation(relation: any[]): boolean {
+    return this.edges.some((item, index) => {
+      return (item[0] === relation[0] && item[1] === relation[1]);
+    });
+  }
 }
