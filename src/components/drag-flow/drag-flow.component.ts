@@ -255,7 +255,7 @@ export class DragFlowComponent implements OnInit {
         position: this.myChart.convertToPixel('grid', item.value),
       };
     });
-    newPosition = newPosition.concat(newPosition);
+    newPosition = newPosition.concat(newPosition).concat(newPosition);
     this.myChart.setOption({
       graphic: newPosition
     });
