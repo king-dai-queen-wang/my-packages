@@ -44,41 +44,15 @@ export class DragFlowComponent implements OnInit {
 
   bindingEvent() {
     const zr = this.myChart.getZr();
-    // 点击事件 , 删除连线
-    this.myChart.on('click', {dataType: 'edge'}, function (params) {
-      if (params.dataType !== 'edge') {
-        return;
-      }
-      self.confirmDialog('确认删除连线吗', self.deleteLine.bind(self, params), () => {});
-      return;
-    });
-
-    this.myChart.on('click', {dataType: 'node'}, function (params) {
-      if (params.dataType !== 'node') {
-        return;
-      }
-      console.log('click nodes', params, self.selectedSourceNodeIndex, self.selectedTargetNodeIndex);
-      self.selectedNodes(params);
-      self.initLinks(params.dataIndex);
-    });
-
-    this.myChart.on('mousemove', {dataType: 'node'}, function (params) {
-      // console.log('click nodes', params);
-      self.focusNodes(params.dataIndex);
-    });
-
-    this.myChart.on('mouseout', {dataType: 'node'}, function (params) {
-      // console.log('click nodes', params);
-      self.unFocusNodes(params.dataIndex);
-    });
-
-    this.myChart.on('dataZoom', self.updatePosition.bind(self));
 
     // 画布监听click，增加节点
     zr.on('click', function (params) {
       if (typeof params.target === 'undefined') {
         self.clearNodeColors();
         self.selectedNodeStep = SelectedTypeEnum.NONE;
+        self.selectedSourceNodeIndex = null;
+        self.selectedTargetNodeIndex = null;
+        return;
       }
 
       if (typeof params.target !== 'undefined' || self.operateMode !== 'addNodes') {
@@ -108,6 +82,33 @@ export class DragFlowComponent implements OnInit {
         }
       }
     });
+    // 点击事件 , 删除连线
+    this.myChart.on('click', {dataType: 'edge'}, function (params) {
+      if (params.dataType !== 'edge') {
+        return;
+      }
+      self.confirmDialog('确认删除连线吗', self.deleteLine.bind(self, params), () => {});
+      return;
+    });
+
+    this.myChart.on('click', {dataType: 'node'}, function (params) {
+      if (params.dataType !== 'node') {
+        return;
+      }
+      self.selectedNodes(params);
+      self.initLinks(params);
+      console.log('click nodes', params, self.selectedSourceNodeIndex, self.selectedTargetNodeIndex);
+    });
+
+    this.myChart.on('mousemove', {dataType: 'node'}, function (params) {
+      self.focusNodes(params.dataIndex);
+    });
+
+    this.myChart.on('mouseout', {dataType: 'node'}, function (params) {
+      self.unFocusNodes(params.dataIndex);
+    });
+
+    this.myChart.on('dataZoom', self.updatePosition.bind(self));
 
   }
 
@@ -341,18 +342,22 @@ export class DragFlowComponent implements OnInit {
   }
 
 // 绘制添加的连线
-  initLinks = (dataIndex) => {
+  initLinks = (node) => {
+    const {dataIndex} = node;
     for (let i = 0; i < this.nodes.length; i++) {
       if (i === dataIndex) {
         if (this.selectedNodeStep === SelectedTypeEnum.NONE) {
           this.selectedSourceNodeIndex = i;
-          this.selectedNodeStep = SelectedTypeEnum.SELECTED;
-        } else if (this.selectedNodeStep === SelectedTypeEnum.SELECTED) {
-          this.selectedTargetNodeIndex = i;
-          this.selectedNodeStep = SelectedTypeEnum.NONE;
-          if (this.selectedTargetNodeIndex === this.selectedSourceNodeIndex) {
+          this.selectedNodeStep = SelectedTypeEnum.SELECTED_SOURCE;
+          self.toggleNodeColor(node, self.selectedSourceNodeColor);
+        } else if (this.selectedNodeStep === SelectedTypeEnum.SELECTED_SOURCE) {
+          if (i === this.selectedSourceNodeIndex) {
+            this.selectedSourceNodeIndex = null;
+            this.selectedNodeStep = SelectedTypeEnum.NONE;
+            self.clearNodeColors();
             return;
           }
+          this.selectedTargetNodeIndex = i;
           if (!this.hasRelation([this.nodes[this.selectedSourceNodeIndex].id, this.nodes[this.selectedTargetNodeIndex].id])) {
             self.confirmDialog('是否建立链接', () => {
               this.edges.push([this.nodes[this.selectedSourceNodeIndex].id, this.nodes[this.selectedTargetNodeIndex].id]);
@@ -374,11 +379,16 @@ export class DragFlowComponent implements OnInit {
                   }
                 }]
               });
+
+              this.selectedNodeStep = SelectedTypeEnum.NONE;
+              this.selectedTargetNodeIndex = null;
+              this.selectedSourceNodeIndex = null;
+              self.clearNodeColors();
+            }, () => {
+              this.selectedNodeStep = SelectedTypeEnum.SELECTED_SOURCE;
+              this.selectedTargetNodeIndex = null;
             });
-
           }
-
-          self.clearNodeColors();
           // return true;
         }
         break;
@@ -404,7 +414,7 @@ export class DragFlowComponent implements OnInit {
   }
 
   selectedNodes(node) {
-    self.toggleNodeColor(node, self.selectedSourceNodeColor);
+
 
   }
 

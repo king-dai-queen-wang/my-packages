@@ -1,4 +1,5 @@
 export enum SelectedTypeEnum {
   'NONE',
-  'SELECTED'
+  'SELECTED_SOURCE',
+  'SELECTED_TARGET'
 }
