@@ -28,7 +28,7 @@
               "projects/demo/src/assets"
             ],
             "styles": [
-              "projects/demo/src/styles.scss"
+              "src/styles.scss"
             ],
             "scripts": [
               "node_modules/echarts/dist/echarts.min.js"
