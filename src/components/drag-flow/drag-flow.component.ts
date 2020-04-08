@@ -60,6 +60,15 @@ export class DragFlowComponent implements OnInit {
     window.addEventListener('resize', self.updatePosition.bind(self));
   }
 
+  onChartReady(myChart: echarts.ECharts) {
+    console.log('ready');
+    this.myChart = myChart;
+    // 在demo里，必须要加setTimeout ，否则执行 myChart.convertToPixel 会报错
+    setTimeout(function() {
+      self.initChart();
+    }, 0);
+  }
+
   getOption() {
     console.log(this.myChart.getOption(), this.selectedSourceNodeIndex, this.selectedTargetNodeIndex);
   }
@@ -420,14 +429,7 @@ export class DragFlowComponent implements OnInit {
     }
   }
 
-  private onChartReady(myChart: echarts.ECharts) {
-    console.log('ready');
-    this.myChart = myChart;
-    // 在demo里，必须要加setTimeout ，否则执行 myChart.convertToPixel 会报错
-    setTimeout(function() {
-      self.initChart();
-    }, 0);
-  }
+
 
   private selectedNodes(node) {
   }
@@ -554,7 +556,7 @@ export class DragFlowComponent implements OnInit {
     }
   }
 
-  private addNodes() {
+  addNodes() {
     this.operateMode = 'addNodes';
   }
 
