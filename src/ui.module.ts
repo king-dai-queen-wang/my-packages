@@ -5,7 +5,6 @@ import {RouterModule} from '@angular/router';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import { NavComponent } from './components/nav/nav.component';
-import './styles.scss';
 import {NgxEchartsModule} from 'ngx-echarts';
 import { WolkflowComponent } from './components/wolkflow/wolkflow.component';
 import { DragFlowComponent } from './components/drag-flow/drag-flow.component';
