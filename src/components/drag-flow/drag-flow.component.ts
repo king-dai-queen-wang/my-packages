@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import * as echarts from 'echarts';
 import {SelectedTypeEnum} from './selected-type.enum';
+import {log} from 'util';
 
 let self;
 
@@ -191,7 +192,7 @@ export class DragFlowComponent implements OnInit {
         self.confirmDialog('确认添加吗', () => {
           if (self.myChart.containPixel('grid', pointInPixel)) {
             const id = 'E' + Math.random();
-            self.nodes.push({name: id, id, value: pointInGrid});
+            self.nodes.push({name: id, id, value: pointInGrid, draggable: true});
             self.initGraphic();
             self.setNodes();
             self.clearOperateStatus();
@@ -273,6 +274,11 @@ export class DragFlowComponent implements OnInit {
         return this.initGraphicDragBtnItem(item, dataIndex);
       })
     });
+    this.myChart.setOption({
+      graphic: echarts.util.map(this.nodes, (item, dataIndex) => {
+        return this.initGraphicEditBtnItem(item, dataIndex);
+      })
+    });
   }
 
   private initGraphicDragBtnItem(item, dataIndex) {
@@ -339,6 +345,38 @@ export class DragFlowComponent implements OnInit {
     };
   }
 
+  private initGraphicEditBtnItem(item, dataIndex) {
+    return {
+      id: `graphic_edit_${item.id}`,
+      // 矩形
+      type: 'rect',
+      // 将坐标转化为像素
+      position: this.myChart.convertToPixel('grid', item.value),
+      shape: {
+        // 拖动点的大小
+        x: 0,
+        y: -1 * (this.symbolSize[0] / 2),
+        width: this.symbolSize[0] / 2,
+        height: this.symbolSize[1] / 2
+      },
+      style: {
+        fill: 'red',
+        lineWidth: 2,
+        borderColor: '#22faf7',
+        borderWidth: 1,
+      },
+
+      // 指定虚拟圈是否可见  false 可见
+      invisible: false,
+      // 指定圈被拖拽（可以与不可以）
+      // draggable: true,
+      // ondrag: echarts.util.curry(this.onPointDragging, dataIndex),
+      onclick: this.editNode.bind(this, item, dataIndex),
+      // 层级
+      z: 3
+    };
+  }
+
   private setNodes() {
     this.myChart.setOption({
       series: [{
@@ -350,6 +388,8 @@ export class DragFlowComponent implements OnInit {
 
 // 图形元素拖动后， 修改节点位置
   private onPointDragging(dataIndex, dx, dy) {
+    const zr = self.myChart.getZr();
+    zr.setCursorStyle('copy');
     if (this.position[0] <= 0) {
       this.position[0] = (self.symbolSize[0] / 2);
     }
@@ -503,6 +543,23 @@ export class DragFlowComponent implements OnInit {
     }
   }
 
+  private editNode(node, NodeIndex) {
+    const name = prompt('请输入node的名字','Bill Gates');
+    console.log(name);
+    if (!!name) {
+      self.nodes.forEach(item => {
+        if (item.id === node.id) {
+          item.name = name;
+        }
+      });
+      self.myChart.setOption({
+        series: [{
+          nodes: self.nodes
+        }]
+      });
+    }
+  }
+
   private deleteNode(params, deleteNodeIndex) {
     console.log('delete node', params);
     this.confirmDialog('确认删除节点吗' + params.name, () => {
@@ -520,7 +577,7 @@ export class DragFlowComponent implements OnInit {
         }
       });
       this.graphicArr.forEach((item, index) => {
-        if (item.id !== `graphic_drag_${params.id}` && item.id !== `graphic_delete_${params.id}`) {
+        if (item.id !== `graphic_drag_${params.id}` && item.id !== `graphic_delete_${params.id}` && item.id !== `graphic_edit_${params.id}`) {
           afterDeleteGraphic.push(item);
         }
       });
@@ -538,6 +595,9 @@ export class DragFlowComponent implements OnInit {
             $action: 'remove',
           }, {
             id: `graphic_delete_${params.id}`,
+            $action: 'remove',
+          },{
+            id: `graphic_edit_${params.id}`,
             $action: 'remove',
           }]
       });
