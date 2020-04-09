@@ -16,6 +16,10 @@ const routes: Routes = [
     loadChildren: './features/component/component.module#ComponentModule'
   },
   {
+    path: 'data-structure',
+    loadChildren: './features/data-structure/data-structure.module#DataStructureModule'
+  },
+  {
     path: 'about',
     loadChildren: './features/about/about.module#AboutModule'
   }

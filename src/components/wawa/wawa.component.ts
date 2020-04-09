@@ -7,7 +7,7 @@ const Data = [[15, 0], [-50, 10], [-56.5, 20], [-46.5, 30], [-22.1, 40]];
 @Component({
   selector: 'dww-wawa',
   templateUrl: './wawa.component.html',
-  styleUrls: ['./wawa.component.css']
+  styleUrls: ['./wawa.component.scss']
 })
 export class WawaComponent implements OnInit, OnDestroy {
 

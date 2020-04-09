@@ -20,6 +20,12 @@ export const ROUTERS: NavInterface[] = [
     children: null
   },
   {
+    name: '数据结构',
+    url: '/data-structure',
+    icon: null,
+    children: null
+  },
+  {
     name: '关于我',
     url: '/about',
     icon: null,
