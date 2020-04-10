@@ -1,7 +1,6 @@
 import {Stack} from '../app/features/data-structure/stack/stack.model';
-
+// 十进制转2进制
 export function dec2bin(decNum: number) {
-  debugger
   const stack = new Stack();
   while (decNum > 0) {
     stack.push(decNum % 2);
