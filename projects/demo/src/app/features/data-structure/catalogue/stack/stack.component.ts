@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {IStack, Stack} from './stack.model';
-import {dec2bin} from '../../../../util/dec2bin';
+import {dec2bin} from '../../../../../util/dec2bin';
 
 @Component({
   selector: 'app-stack',

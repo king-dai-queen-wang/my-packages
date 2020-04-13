@@ -1,4 +1,4 @@
-import {Queue} from '../app/features/data-structure/queue/queue';
+import {Queue} from '../app/features/data-structure/catalogue/queue/queue';
 // 击鼓传花
 export function passFlower(nameList: any[] = [], num) {
   const queue = new Queue();

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {Queue} from './queue';
-import {passFlower} from '../../../../util/passFlower';
+import {passFlower} from '../../../../../util/passFlower';
 import PriorityQueue from './priority-queue';
 
 @Component({

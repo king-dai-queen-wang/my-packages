@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import {CatalogueComponent} from './catalogue/catalogue.component';
-import {StackComponent} from './stack/stack.component';
-import {QueueComponent} from './queue/queue.component';
-import {LinkedListComponent} from './linked-list/linked-list.component';
+import {StackComponent} from './catalogue/stack/stack.component';
+import {QueueComponent} from './catalogue/queue/queue.component';
+import {LinkedListComponent} from './catalogue/linked-list/linked-list.component';
+import {SetCollectionComponent} from './catalogue/set-collection/set-collection.component';
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
       {
         path: 'linked-list',
         component: LinkedListComponent
+      },
+      {
+        path: 'set-collection',
+        component: SetCollectionComponent
       }
     ]
   }

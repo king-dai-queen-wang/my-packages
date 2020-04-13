@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {LinkedList} from './linked-list';
-import { DoublyLinkedList } from './doubly-linked-list';
+import {DoublyLinkedList, IDoubleLinkedList} from './doubly-linked-list';
 
 @Component({
   selector: 'app-linked-list',
@@ -21,11 +21,15 @@ export class LinkedListComponent implements OnInit {
     linkedList.removeAt(3);
     linkedList.remove('dww22');
     console.table(linkedList.toString());
-    const doublyLinkedList = new DoublyLinkedList();
-    doublyLinkedList.append('dw1');
-    doublyLinkedList.append('dw2');
-    doublyLinkedList.append('dw3');
-    doublyLinkedList.append('dw4');
+    const doublyLinkedList: IDoubleLinkedList = new DoublyLinkedList();
+    doublyLinkedList.insert(0, 'dw1');
+    doublyLinkedList.insert(2, 'err');
+    doublyLinkedList.insert(1, 'dw2');
+    doublyLinkedList.insert(2, 'dw3');
+    doublyLinkedList.insert(0, 'dw4');
+    doublyLinkedList.update(1, 'nnn');
+    console.table(doublyLinkedList.backwardString());
+    console.log(doublyLinkedList.removeAt(3));
   }
 
 }

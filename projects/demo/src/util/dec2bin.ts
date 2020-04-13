@@ -1,4 +1,4 @@
-import {Stack} from '../app/features/data-structure/stack/stack.model';
+import {Stack} from '../app/features/data-structure/catalogue/stack/stack.model';
 // 十进制转2进制
 export function dec2bin(decNum: number) {
   const stack = new Stack();
