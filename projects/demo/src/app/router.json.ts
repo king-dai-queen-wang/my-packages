@@ -9,9 +9,19 @@ export const ROUTERS: NavInterface[] = [
   },
   {
     name: '我的作品',
-    url: '/component',
+    url: '/my-works',
     icon: null,
-    children: null
+    children: [
+      {
+        name: 'list',
+        url: './my-works/list',
+        icon: null
+      },
+      {
+        name: '俄罗斯方块',
+        url: '/my-works/tetris',
+        icon: null,
+      }]
   },
   {
     name: '组件',

@@ -1,0 +1,60 @@
+<p>
+  请用方向键和空格键进行操作，上旋转，下-》 下一个，左右 -》 方向， 空格 -》 坠落
+</p>
+<div class="local">
+  <div class="title">我的游戏区域</div>
+  <div class="game" #local_game tabindex="0"
+       (keydown.arrowDown)="localTetris.game.down()"
+       (keydown.arrowLeft)="localTetris.game.left()"
+       (keydown.arrowRight)="localTetris.game.right()"
+       (keydown.arrowUp)="localTetris.game.rotate()"
+       (keydown.space)="localTetris.game.fall()"
+  >
+
+  </div>
+  <div class="next" #local_next>
+  </div>
+  <div class="info" #local_info>
+    <p> 已用时 <span #local_time></span> s </p>
+    <p> 已得分 <span #local_score></span> 分 </p>
+    <p> <span #local_result></span></p>
+  </div>
+</div>
+<div class="remote">
+  <div class="title">对方的游戏区域</div>
+  <div class="game" #remote_game tabindex="0"
+       (keydown.arrowDown)="remoteTetris.game.down()"
+       (keydown.arrowLeft)="remoteTetris.game.left()"
+       (keydown.arrowRight)="remoteTetris.game.right()"
+       (keydown.arrowUp)="remoteTetris.game.rotate()"
+       (keydown.space)="remoteTetris.game.fall()"
+  >
+
+
+  </div>
+  <div class="btns">
+    <button (click)="remoteTetris.game.rotate()">rotate</button>
+    <button (click)="remoteTetris.game.down()">下</button>
+    <button (click)="remoteTetris.game.left()">左</button>
+    <button (click)="remoteTetris.game.right()">右</button>
+    <button (click)="remoteTetris.game.fall()">fall</button>
+    <button (click)="remoteTetris.game.fixed()">fixed</button>
+    <button (click)="remoteTetris.game.performNext(2, 2)">performanceNext</button>
+    <button (click)="remoteTetris.game.checkClear()">checkClear</button>
+    <button (click)="remoteTetris.game.checkGameOver()">checkGameOver</button>
+    <button (click)="remoteTetris.game.addScore(10)">addScore</button>
+    <button (click)="remoteTetris.game.addTailLines([[0,0,0,0,1,1,1,1,0,1]])">addTailLines</button>
+    <button (click)="remoteTetris.game.setTime(20)">setTime</button>
+    <button (click)="remoteTetris.game.gameOver(true)">gameOver</button>
+  </div>
+
+  <div class="next" #remote_next>
+  </div>
+  <div class="info" #remote_info>
+    <p> 已用时 <span #remote_time></span> s </p>
+    <p> 已得分 <span #remote_score></span> 分 </p>
+    <p> <span #remote_result></span></p>
+  </div>
+</div>
+
+

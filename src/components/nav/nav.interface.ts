@@ -4,5 +4,5 @@ export interface NavInterface {
   name: string;
   url: string;
   icon: string;
-  children: NavInterface[];
+  children?: NavInterface[];
 }
