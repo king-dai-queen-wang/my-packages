@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {TetrisLocal} from './models/tetris-local';
 import {TetrisRemote} from './models/tetris-remote';
+import * as io from 'socket.io-client';
 
 @Component({
   selector: 'app-tetris',
@@ -19,10 +20,11 @@ export class TetrisComponent implements OnInit, AfterViewInit {
   @ViewChild('remote_time', {read: ElementRef, static: false}) remoteTime: ElementRef;
   @ViewChild('remote_score', {read: ElementRef, static: false}) remoteScore: ElementRef;
   @ViewChild('remote_result', {read: ElementRef, static: false}) remoteResult: ElementRef;
-
+  @ViewChild('recv', {read: ElementRef, static: false}) recv: ElementRef;
 
   localTetris: TetrisLocal;
   remoteTetris: TetrisRemote;
+  websocket: SocketIOClient.Socket;
   constructor(private render2: Renderer2) {
   }
 
@@ -45,6 +47,32 @@ export class TetrisComponent implements OnInit, AfterViewInit {
       this.remoteTime.nativeElement,
       this.remoteScore.nativeElement,
       this.remoteResult.nativeElement, 2, 2);
+  }
+
+  createWebSocket() {
+    const _this = this;
+    this.websocket =  io('http://localhost:3000');
+    this.websocket.on('my other event', function(data) {
+      const div = _this.render2.createElement('div');
+      div.innerHTML = data.hello;
+      _this.recv.nativeElement.appendChild(div);
+    });
+    // const _this = this;
+    // this.websocket.onclose = function() {
+    //   console.log('websocket closed');
+    //   _this.recv.nativeElement.innerHTML = 'Closed';
+    // };
+    //
+    // this.websocket.onmessage = function(e) {
+    //   console.log(e.data);
+    //   const div = _this.render2.createElement('div');
+    //   div.innerHTML = e.data;
+    //   _this.recv.nativeElement.appendChild(div);
+    // };
+  }
+
+  sendWebsocket({target}: {target: HTMLInputElement}) {
+    this.websocket.emit('news', {my: target.value});
   }
 
 }
