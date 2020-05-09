@@ -1,14 +1,14 @@
 import {AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
-import {TetrisLocal} from './models/tetris-local';
-import {TetrisRemote} from './models/tetris-remote';
+import {TetrisLocal} from '../models/tetris-local';
+import {TetrisRemote} from '../models/tetris-remote';
 import * as io from 'socket.io-client';
 
 @Component({
-  selector: 'app-tetris',
-  templateUrl: './tetris.component.html',
-  styleUrls: ['./tetris.component.scss']
+  selector: 'app-remote-tetris',
+  templateUrl: './remote-tetris.component.html',
+  styleUrls: ['./remote-tetris.component.scss']
 })
-export class TetrisComponent implements OnInit, AfterViewInit {
+export class RemoteTetrisComponent implements OnInit, AfterViewInit {
   @ViewChild('local_game', {read: ElementRef, static: true}) localGame: ElementRef;
   @ViewChild('local_next', {read: ElementRef, static: false}) localNext: ElementRef;
   @ViewChild('local_time', {read: ElementRef, static: false}) localTime: ElementRef;

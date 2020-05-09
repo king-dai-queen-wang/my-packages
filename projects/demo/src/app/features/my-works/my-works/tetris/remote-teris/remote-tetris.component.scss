@@ -1,0 +1,65 @@
+:host{
+  display: block;
+
+  background-color: #dddddd;
+}
+.local,.remote{
+  position: relative;
+  width: 50%;
+}
+.local{
+  float: left;
+}
+.remote{
+  float: right;
+}
+.game{
+  width: 200px;
+  height: 400px;
+  background-color: #F2FaFF;
+  border: 1px solid blue;
+  border-top: unset;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+.next{
+  width: 80px;
+  height: 80px;
+  background-color: #f2faff;
+  position: absolute;
+  top: 20px;
+  left: 250px;
+  border: 1px solid blue;
+}
+.info{
+  position: absolute;
+  top: 100px;
+  left: 250px;
+}
+
+.none,.current,.done{
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  box-sizing: border-box;
+}
+.none{
+  background-color: #f2faff;
+}
+.current{
+  background-color: pink;
+  border: 1px solid red;
+}
+.done{
+  background-color: grey;
+  border: 1px solid black;
+}
+.btns{
+  position: absolute;
+  left: 250px;
+  top: 163px;
+  button{
+    display: block;
+  }
+}

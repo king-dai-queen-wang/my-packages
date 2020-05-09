@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import {MyWorksComponent} from './my-works/my-works.component';
-import {TetrisComponent} from './my-works/tetris/tetris.component';
+import {TetrisComponent} from './my-works/tetris/local-teris/tetris.component';
+import {RemoteTetrisComponent} from './my-works/tetris/remote-teris/remote-tetris.component';
 
 
 const routes: Routes = [{
@@ -13,6 +14,9 @@ const routes: Routes = [{
 }, {
   path: 'tetris',
   component: TetrisComponent
+},{
+  path: 'remote-tetris',
+  component: RemoteTetrisComponent
 }];
 
 @NgModule({
