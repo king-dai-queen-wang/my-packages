@@ -46,10 +46,6 @@
     <button (click)="remoteTetris.game.addTailLines([[0,0,0,0,1,1,1,1,0,1]])">addTailLines</button>
     <button (click)="remoteTetris.game.setTime(20)">setTime</button>
     <button (click)="remoteTetris.game.gameOver(true)">gameOver</button>
-
-    <input type="text" (input)="sendWebsocket($event)"/>
-    <button (click)="createWebSocket()">websocket</button>
-    <p #recv></p>
   </div>
 
   <div class="next" #remote_next>

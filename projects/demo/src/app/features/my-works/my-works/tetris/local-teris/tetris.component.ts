@@ -20,10 +20,9 @@ export class TetrisComponent implements OnInit, AfterViewInit {
   @ViewChild('remote_time', {read: ElementRef, static: false}) remoteTime: ElementRef;
   @ViewChild('remote_score', {read: ElementRef, static: false}) remoteScore: ElementRef;
   @ViewChild('remote_result', {read: ElementRef, static: false}) remoteResult: ElementRef;
-  @ViewChild('recv', {read: ElementRef, static: false}) recv: ElementRef;
 
   localTetris: TetrisLocal;
-  remoteTetris: TetrisRemote;
+  remoteTetris: TetrisLocal;
   websocket: SocketIOClient.Socket;
   constructor(private render2: Renderer2) {
   }
@@ -32,47 +31,21 @@ export class TetrisComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.localTetris = new TetrisLocal(this.render2);
-    this.localTetris.start(
-      this.localGame.nativeElement,
+    this.localTetris = new TetrisLocal(this.render2, this.localGame.nativeElement,
       this.localNext.nativeElement,
       this.localTime.nativeElement,
       this.localScore.nativeElement,
       this.localResult.nativeElement);
 
-    this.remoteTetris = new TetrisRemote(this.render2);
-    this.remoteTetris.start(
+    this.localTetris.start(this.localTetris.generateType(), this.localTetris.generateDir());
+
+    this.remoteTetris = new TetrisLocal(this.render2,
       this.remoteGame.nativeElement,
       this.remoteNext.nativeElement,
       this.remoteTime.nativeElement,
       this.remoteScore.nativeElement,
-      this.remoteResult.nativeElement, 2, 2);
-  }
-
-  createWebSocket() {
-    const _this = this;
-    this.websocket =  io('http://localhost:3000');
-    this.websocket.on('my other event', function(data) {
-      const div = _this.render2.createElement('div');
-      div.innerHTML = data.hello;
-      _this.recv.nativeElement.appendChild(div);
-    });
-    // const _this = this;
-    // this.websocket.onclose = function() {
-    //   console.log('websocket closed');
-    //   _this.recv.nativeElement.innerHTML = 'Closed';
-    // };
-    //
-    // this.websocket.onmessage = function(e) {
-    //   console.log(e.data);
-    //   const div = _this.render2.createElement('div');
-    //   div.innerHTML = e.data;
-    //   _this.recv.nativeElement.appendChild(div);
-    // };
-  }
-
-  sendWebsocket({target}: {target: HTMLInputElement}) {
-    this.websocket.emit('news', {my: target.value});
+      this.remoteResult.nativeElement);
+    this.remoteTetris.start( 2, 2);
   }
 
 }

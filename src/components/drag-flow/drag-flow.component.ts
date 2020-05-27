@@ -21,7 +21,7 @@ export class DragFlowComponent implements OnInit {
   @Input() nodes: { id: any, name: string, value: number[], itemStyle?: { color?: string } }[];
   private lineStyle = {
     curveness: 0.1,
-    color: '#9EADD6',
+    color: '#000',
     // normal: {
     //   color: '#9EADD6',
     //   width: 1,
@@ -127,22 +127,22 @@ export class DragFlowComponent implements OnInit {
         splitNumber: 10,
         show: true
       },
-      dataZoom: [
-        {
-          show: true,
-          type: 'inside',
-          filterMode: 'none',
-          xAxisIndex: [0],
-          startValue: -500,
-          endValue: 500
-        }, {
-          show: true,
-          type: 'inside',
-          filterMode: 'none',
-          yAxisIndex: [0],
-          startValue: -500,
-          endValue: 500
-        }],
+      // dataZoom: [
+      //   {
+      //     show: true,
+      //     type: 'inside',
+      //     filterMode: 'none',
+      //     xAxisIndex: [0],
+      //     startValue: -500,
+      //     endValue: 500
+      //   }, {
+      //     show: true,
+      //     type: 'inside',
+      //     filterMode: 'none',
+      //     yAxisIndex: [0],
+      //     startValue: -500,
+      //     endValue: 500
+      //   }],
       series: [{
         // 设置id很重要
         id: 'a',
@@ -285,21 +285,17 @@ export class DragFlowComponent implements OnInit {
     return {
       id: `graphic_drag_${item.id}`,
       // 矩形
-      type: 'rect',
+      type: 'image',
       // 将坐标转化为像素
       position: this.myChart.convertToPixel('grid', item.value),
-      shape: {
-        // 拖动点的大小
-        x: -1 * (this.symbolSize[0] / 2),
-        y: 0,
-        width: this.symbolSize[0] / 2,
-        height: this.symbolSize[1] / 2
-      },
       style: {
-        fill: '#3FA7DC50',
-        lineWidth: 2,
-        borderColor: '#22faf7',
-        borderWidth: 1,
+        image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1590577828238&' +
+          'di=2e49896024495dbed4f1c210f75e3461&imgtype=0&' +
+          'src=http%3A%2F%2Fbpic.588ku.com%2Felement_origin_min_pic%2F01%2F40%2F53%2F91573d047e24b8b.jpg',
+        width: 30,
+        height: 30,
+        x: (this.symbolSize[0] / 2 + 5),
+        y: (this.symbolSize[1] / 2 - 30),
       },
 
       // 指定虚拟圈是否可见  false 可见
@@ -319,19 +315,13 @@ export class DragFlowComponent implements OnInit {
       type: 'image',
       // 将坐标转化为像素
       position: this.myChart.convertToPixel('grid', item.value),
-      shape: {
-        // 拖动点的大小
-        x: -1 * (this.symbolSize[0] / 2),
-        y: -1 * (this.symbolSize[1] / 2),
-      },
       style: {
-        image: 'https://iknowpc.bdimg.com/static/common/widget/search-box-new/img/logo-new.aff256e.png',
-        fill: '#ddd',
+        image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1590576410090&di=a925d8a8f04d38629fd98fbcf91e037d' +
+          '&imgtype=0&src=http%3A%2F%2Fbpic.588ku.com%2Felement_origin_min_pic%2F01%2F49%2F31%2F8457446028aeedf.jpg',
         width: 30,
         height: 30,
-        lineWidth: 2,
-        borderColor: '#22faf7',
-        borderWidth: 1,
+        x: (this.symbolSize[0] / 2 + 5),
+        y: -1 * (this.symbolSize[1] / 2 + 30),
       },
 
       // 指定虚拟圈是否可见  false 可见
@@ -349,21 +339,17 @@ export class DragFlowComponent implements OnInit {
     return {
       id: `graphic_edit_${item.id}`,
       // 矩形
-      type: 'rect',
+      type: 'image',
       // 将坐标转化为像素
       position: this.myChart.convertToPixel('grid', item.value),
-      shape: {
-        // 拖动点的大小
-        x: 0,
-        y: -1 * (this.symbolSize[0] / 2),
-        width: this.symbolSize[0] / 2,
-        height: this.symbolSize[1] / 2
-      },
       style: {
-        fill: 'red',
-        lineWidth: 2,
-        borderColor: '#22faf7',
-        borderWidth: 1,
+        image: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&' +
+          'sec=1590577717887&di=1e499482fc24e5d8733de0e8061bdd4d' +
+          '&imgtype=0&src=http%3A%2F%2Fku.90sjimg.com%2Felement_origin_min_pic%2F00%2F85%2F92%2F8256ea2efa5b273.jpg',
+        x: (this.symbolSize[0] / 2 + 5),
+        y: -1 * (this.symbolSize[1] / 2),
+        width: 30,
+        height: 30
       },
 
       // 指定虚拟圈是否可见  false 可见
@@ -461,7 +447,7 @@ export class DragFlowComponent implements OnInit {
               this.selectedTargetNodeIndex = null;
             });
           }
-          // return true;
+          return true;
         }
         break;
       }
@@ -577,7 +563,8 @@ export class DragFlowComponent implements OnInit {
         }
       });
       this.graphicArr.forEach((item, index) => {
-        if (item.id !== `graphic_drag_${params.id}` && item.id !== `graphic_delete_${params.id}` && item.id !== `graphic_edit_${params.id}`) {
+        if (item.id !== `graphic_drag_${params.id}` && item.id !== `graphic_delete_${params.id}` &&
+          item.id !== `graphic_edit_${params.id}`) {
           afterDeleteGraphic.push(item);
         }
       });
@@ -601,6 +588,7 @@ export class DragFlowComponent implements OnInit {
             $action: 'remove',
           }]
       });
+      this.edges = afterDeletedLines.map(item => ([item.source, item.target]));
       this.resetNodes();
     });
   }

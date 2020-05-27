@@ -15,6 +15,9 @@ export class HomeComponent implements OnInit {
       id: 'id-a',
       name: 'A',
       value: [115, 150],
+      payload: {
+        xxxxx: 123
+      }
     },
     {
       id: 'id-b',

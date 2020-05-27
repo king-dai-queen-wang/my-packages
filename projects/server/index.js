@@ -6,7 +6,7 @@ const server = require('http').createServer(app.callback());
 const io = require('socket.io')(server);
 let connectedCounter = 0;
 const ctxs = [];
-let conns = {};
+let socketMap = {};
 
 server.listen(3000,()=>{
   console.log('server is starting at port 3000');
@@ -14,58 +14,66 @@ server.listen(3000,()=>{
 
 // socket连接
 io.on('connection', (socket) => {
-  console.log('connected')
+  connectedCounter++;
+  socket.clientNum = connectedCounter;
+  socket.nickName = 'user' + connectedCounter;
+  socketMap[socket.clientNum] = socket;
+  if (socket.clientNum % 2 === 1) {
+    socket.emit('waiting', 'wating for another person');
+  } else {
+    if (socketMap[socket.clientNum - 1]) {
+      socket.emit('start');
+      socketMap[socket.clientNum - 1].emit('start');
+    } else {
+      socket.emit('leave');
+    }
+  }
+  io.emit('enter', socket.nickName + 'comes in');
 
-  socket.on('news', function (data) {
-    console.log(data);
-    io.emit('my other event', {hello: data.my});
+
+  socket.on('disconnect', function () {
+    if (socket.clientNum % 2 === 1) {
+      socketMap[socket.clientNum + 1] && socketMap[socket.clientNum + 1].emit('leave');
+    } else {
+      socketMap[socket.clientNum - 1] && socketMap[socket.clientNum - 1].emit('leave');
+    }
+    delete (socketMap[socket.clientNum]);
   });
+
+  bindSocketEventListener(socket, 'init');
+  bindSocketEventListener(socket, 'performNext');
+  bindSocketEventListener(socket, 'rotate');
+  bindSocketEventListener(socket, 'left');
+  bindSocketEventListener(socket, 'right');
+  bindSocketEventListener(socket, 'fall');
+  bindSocketEventListener(socket, 'fixed');
+  bindSocketEventListener(socket, 'line');
+  bindSocketEventListener(socket, 'down');
+  bindSocketEventListener(socket, 'time');
+  bindSocketEventListener(socket, 'lose');
+  bindSocketEventListener(socket, 'bottomLines');
+  bindSocketEventListener(socket, 'addTailLines');
+
 });
+
+function  bindSocketEventListener(socket, event) {
+  socket.on(event, function (data) {
+    if (socket.clientNum % 2 === 0) {
+      socketMap[socket.clientNum - 1] && socketMap[socket.clientNum - 1].emit(event, data);
+    } else {
+      socketMap[socket.clientNum + 1] && socketMap[socket.clientNum + 1].emit(event, data);
+    }
+  })
+}
 
 router.all('/', async function (ctx) {
   ctx.body = '请求成功了'
 });
 
-// Regular middleware
-/*app.ws.use(function(ctx, next) {
-  // return `next` to pass the context (ctx) on to the next ws middleware
-  conns = ({
-    id: [connectedCounter],
-    ctx: ctx
-  });
-  const msg = {
-    type: 'enter',
-    data: conns.id + 'comes in'
-  };
-  connectedCounter++;
-  broadCast(JSON.stringify(msg));
-  ctxs.push(ctx);
-  return next(ctx);
-});
-
-// Using routes
-app.ws.use(route.all('/test/:id', function (ctx) {
-  // `ctx` is the regular koa context created from the `ws` onConnection `socket.upgradeReq` object.
-  // the websocket is added to the context on `ctx.websocket`.
-  ctx.websocket.on('message', function(message) {
-    // do something with the message from client
-    const msg = {
-      type: 'message',
-      data: message.toUpperCase() + "!!!"
-    };
-    broadCast(JSON.stringify(msg));
-  });
-}));
-
-function broadCast(str) {
-  ctxs.forEach(ctx => {
-    ctx.websocket.send(`${conns.id} says: ${str}`);
-  })
-}*/
 app.use(router.routes()) .use(router.allowedMethods());
 
 app.use(async (ctx, next)=> {
-  ctx.set('Access-Control-Allow-Origin', 'http://localhost:4102');
+  ctx.set('Access-Control-Allow-Origin', 'http://10.69.9.203:4102/');
   ctx.set('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
   ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
   ctx.set('Access-Control-Allow-Credentials', 'true');

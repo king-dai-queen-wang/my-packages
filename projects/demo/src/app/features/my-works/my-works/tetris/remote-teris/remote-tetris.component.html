@@ -1,14 +1,15 @@
 <p>
   请用方向键和空格键进行操作，上旋转，下-》 下一个，左右 -》 方向， 空格 -》 坠落
 </p>
+<p #waiting></p>
 <div class="local">
   <div class="title">我的游戏区域</div>
   <div class="game" #local_game tabindex="0"
-       (keydown.arrowDown)="localTetris.game.down()"
-       (keydown.arrowLeft)="localTetris.game.left()"
-       (keydown.arrowRight)="localTetris.game.right()"
-       (keydown.arrowUp)="localTetris.game.rotate()"
-       (keydown.space)="localTetris.game.fall()"
+       (keydown.arrowDown)="down()"
+       (keydown.arrowLeft)="left()"
+       (keydown.arrowRight)="right()"
+       (keydown.arrowUp)="rotate()"
+       (keydown.space)="fall()"
   >
 
   </div>
@@ -49,6 +50,7 @@
 
     <input type="text" (input)="sendWebsocket($event)"/>
     <button (click)="createWebSocket()">websocket</button>
+    <button (click)="disconnect()">disconnect</button>
     <p #recv></p>
   </div>
 
