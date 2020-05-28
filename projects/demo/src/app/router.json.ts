@@ -26,6 +26,11 @@ export const ROUTERS: NavInterface[] = [
         name: '联机版俄罗斯方块',
         url: '/my-works/remote-tetris',
         icon: null,
+      },
+      {
+        name: '拖拽看板',
+        url: '/my-works/drag-drop-dashboard',
+        icon: null,
       }]
   },
   {

@@ -1,0 +1,44 @@
+<section class="flex-row main">
+  <div class="flex-1 card">
+    <header>状态A</header>
+    <ul rpsDrop (rpsDrop)="onDrop($event)">
+      <li *ngFor="let item of dropList; index as i"
+          draggable="true"
+          class="card-item"
+          rpsDrag
+          (dragover)="dragover($event)"
+          [rpsDragData]="item.id"
+          [id]="item.id"
+          (rpsDragStart)="onDragStart($event, item.id)"
+          (rpsDragEnd)="onDragEnd($event, item.id)"
+      >{{item.name}}</li>
+    </ul>
+  </div>
+  <div class="flex-1 card">
+    <header>状态B</header>
+    <ul rpsDrop (rpsDrop)="onDrop($event)"></ul>
+  </div>
+  <div class="flex-1 card">
+    <header>状态C</header>
+    <ul rpsDrop (rpsDrop)="onDrop($event)"></ul>
+  </div>
+  <div class="flex-row flex-1">
+    <div class="wh50p card">
+      <header>状态D</header>
+      <ul rpsDrop (rpsDrop)="onDrop($event)"></ul>
+    </div>
+    <div class="wh50p card">
+      <header>状态E</header>
+      <ul rpsDrop (rpsDrop)="onDrop($event)"></ul>
+    </div>
+    <div class="wh50p card">
+      <header>状态F</header>
+      <ul rpsDrop (rpsDrop)="onDrop($event)"></ul>
+    </div>
+    <div class="wh50p card">
+      <header>状态G</header>
+      <ul rpsDrop (rpsDrop)="onDrop($event)"></ul>
+    </div>
+  </div>
+
+</section>
