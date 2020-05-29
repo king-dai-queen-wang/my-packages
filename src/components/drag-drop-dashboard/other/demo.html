@@ -1,187 +1,103 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html>
 
-<head>
-
+<head lang="en">
   <meta charset="UTF-8">
-
-  <title>HTML5-Drag-Demo by 顽Shi</title>
-
+  <title>拖动</title>
   <style>
+    h2 {
+      font-size: 20px;
+      color: #0d88c1;
+    }
 
-    .column {
-
-      height: 200px;
-
-      width: 200px;
-
+    div#left,
+    div#right {
+      width: 120px;
       float: left;
+      margin: 10px 100px 10px 0px;
+      height: 240px;
+      background-color: #dddddd;
+      border: 1px solid #000;
+      overflow-y: auto;
+    }
 
-      border: 1px solid black;
-
-      background-color: green;
-
-      margin-right: 5px;
-
+    div label {
+      font-size: 22px;
+      font-weight: bold;
+      width: 100%;
+      display: inline-block;
+      padding: 4px 0;
       text-align: center;
-
-      cursor: move;
-
+      margin: 0px 0 2px 0;
+      color: #fff;
+      background-color: #0d88c1;
     }
-
-    .column header {
-
-      color: black;
-
-      text-shadow: #000 0 1px;
-
-      box-shadow: 5px;
-
-      padding: 5px;
-
-      background: red;
-
-      border-bottom: 1px solid black;
-
-    }
-
-    .column.over {
-
-      border: 3px dashed #000;
-
-    }
-
   </style>
-
 </head>
 
 <body>
-
-<div id="columns">
-
-  <div class="column" draggable="true"><header>div1</header></div>
-
-  <div class="column" draggable="true"><header>div2</header></div>
-
-  <div class="column" draggable="true"><header>div3</header></div>
-
+<h2>拖放（Drag 和 drop）</h2>
+<!-- 左边元素框 -->
+<div id="left">
+  <label draggable="true">index1</label>
+  <label draggable="true">index2</label>
+  <label draggable="true">index3</label>
+  <label draggable="true">index4</label>
+  <label draggable="true">index5</label>
+  <label draggable="true">index6</label>
+  <label draggable="true">index7</label>
 </div>
-
-</body>
-
+<!-- 右边元素框 -->
+<div id="right"></div>
 <script>
+    var moveItem = document.getElementsByTagName('label');
 
-    var columns = document.querySelectorAll('#columns .column');
-
-
-
-    var dragEl = null;
-
-
-
-    [].forEach.call(columns,function(column){
-
-        column.addEventListener("dragstart",domdrugstart,false);
-
-        column.addEventListener('dragenter', domdrugenter, false);
-
-        column.addEventListener('dragover', domdrugover, false);
-
-        column.addEventListener('dragleave', domdrugleave, false);
-
-        column.addEventListener('drop', domdrop, false);
-
-        column.addEventListener('dragend', domdrapend, false);
-
-    });
-
-
-
-    function domdrugstart(e) {
-
-        e.target.style.opacity = '0.5';
-
-
-
-        dragEl = this;
-
-
-
-        e.dataTransfer.effectAllowed = "move";
-
-        e.dataTransfer.setData("text/html",this.innerHTML);
-
+    for (let i = 0; i < moveItem.length; i++) {
+        //动态设置label元素id
+        moveItem[i].setAttribute('id', 'label' + i);
+        moveItem[i].ondragstart = function (ev) {
+            //dataTransfer.setData() 方法设置被拖数据的数据类型和值
+            ev.dataTransfer.setData("Text", this.id);
+        };
     }
 
-    function domdrugenter(e) {
-
-        e.target.classList.add('over');
-
+    //左－〉右
+    document.getElementById('right').ondragover = function (ev) {
+        ev.preventDefault(); //阻止向上冒泡
     }
-
-    function domdrugover(e) {
-
-        if (e.preventDefault) {
-
-            e.preventDefault();
-
+    document.getElementById('right').ondrop = function (ev) {
+        ev.preventDefault();
+        var id = ev.dataTransfer.getData('Text');
+        var elem = document.getElementById(id); //当前拖动的元素
+        var toElem = ev.toElement.id; //放置位置
+        if (toElem == 'right') {
+            //如果为container,元素放置在末尾
+            this.appendChild(elem);
+        } else {
+            //如果为container里的元素，则插入该元素之前
+            this.insertBefore(elem, document.getElementById(toElem));
         }
-
-
-
-        e.dataTransfer.dropEffect = 'move';
-
-
-
-        return false;
-
     }
 
-    function domdrugleave(e) {
 
-        e.target.classList.remove('over');
-
+    //右－〉左
+    document.getElementById('left').ondragover = function (ev) {
+        ev.preventDefault(); //阻止向上冒泡
     }
-
-    function domdrop(e) {
-
-        if (e.stopPropagation) {
-
-            e.stopPropagation();
-
+    document.getElementById('left').ondrop = function (ev) {
+        ev.preventDefault();
+        var id = ev.dataTransfer.getData('Text');
+        var elem = document.getElementById(id);
+        var toElem = ev.toElement.id;
+        if (toElem == 'left') {
+            //如果为container,元素放置在末尾
+            event.target.parentNode
+        } else {
+            //如果为container里的元素，则插入该元素之前
+            this.insertBefore(elem, document.getElementById(toElem));
         }
-
-
-
-// 位置互换
-
-        if (dragEl != this) {
-
-            dragEl.innerHTML = this.innerHTML;
-
-            this.innerHTML = e.dataTransfer.getData('text/html');
-
-        }
-
-
-
-        return false;
-
     }
-
-    function domdrapend(e) {
-
-        [].forEach.call(columns, function (column) {
-
-            column.classList.remove('over');
-
-            column.style.opacity = '1';
-
-        });
-
-    }
-
 </script>
+</body>
 
 </html>
