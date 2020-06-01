@@ -1,0 +1,35 @@
+// tooltip
+.nav{
+  position: relative;
+  .tooltip{
+    display: none;
+    opacity: 0;
+    width: 20rem;
+    position: absolute;
+    z-index: 1;
+    box-shadow: -1px 5px 17px -2px rgba(0, 0, 0, 0.4);
+    padding: 4px;
+    background: white;
+    margin: 4px;
+    &::before{
+      content: '';
+      border: 5px solid transparent;
+      border-right-color: white;
+      position: absolute;
+      top: 20%;
+      left: -10px;
+      transform: translateY(-50%);
+    }
+  }
+  &:hover{
+    .tooltip{
+      display: inline-block;
+      opacity: .5;
+      transition: opacity 100ms ease-in-out;
+    }
+  }
+}
+
+ul{
+  list-style-position: inside;
+}

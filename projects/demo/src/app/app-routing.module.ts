@@ -16,6 +16,10 @@ const routes: Routes = [
     loadChildren: './features/component/component.module#ComponentModule'
   },
   {
+    path: 'h5-practice',
+    loadChildren: './features/h5-practice/h5-practice.module#H5PracticeModule'
+  },
+  {
     path: 'data-structure',
     loadChildren: './features/data-structure/data-structure.module#DataStructureModule'
   },

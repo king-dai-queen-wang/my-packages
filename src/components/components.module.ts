@@ -10,12 +10,13 @@ import {FormsModule} from '@angular/forms';
 import {NgxEchartsModule} from 'ngx-echarts';
 import {HttpClientModule} from '@angular/common/http';
 import {DirectiveModule} from '../directive/directive.module';
+import { TooltipComponent } from './tooltip/tooltip.component';
 
 
 
 @NgModule({
   declarations: [WawaComponent, NavComponent, WolkflowComponent,
-    DragFlowComponent, DragDropDashboardComponent],
+    DragFlowComponent, DragDropDashboardComponent, TooltipComponent],
   imports: [
     CommonModule,
     RouterModule,

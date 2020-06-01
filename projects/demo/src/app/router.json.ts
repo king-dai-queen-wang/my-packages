@@ -46,6 +46,12 @@ export const ROUTERS: NavInterface[] = [
     children: null
   },
   {
+    name: 'H5练习',
+    url: '/h5-practice',
+    icon: null,
+    children: null
+  },
+  {
     name: '关于我',
     url: '/about',
     icon: null,
