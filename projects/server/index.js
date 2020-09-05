@@ -12,7 +12,7 @@ server.listen(3000,()=>{
   console.log('server is starting at port 3000');
 });
 
-router.post('/api', async function (ctx, next) {
+router.get('/api', async function (ctx, next) {
   await next('dd');
 });
 
@@ -25,7 +25,7 @@ router.all('/', async function (ctx, next) {
 app.use(router.routes()).use(router.allowedMethods());
 
 app.use(async (ctx, next)=> {
-  ctx.set('Access-Control-Allow-Origin', 'http://10.69.9.203:4102');
+  ctx.set('Access-Control-Allow-Origin', 'http://localhost:4102');
   ctx.set('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
   ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
   ctx.set('Access-Control-Allow-Credentials', 'false');

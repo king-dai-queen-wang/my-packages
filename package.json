@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --host=0.0.0.0 --port=4102 --proxy-config projects/demo/proxy/proxy.conf.json",
+    "server": "nodemon projects/server/index.js",
     "build": "ng build",
     "build:lib": "ng-packagr -p package.json",
     "deploy:lib": "npm publish",
