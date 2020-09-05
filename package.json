@@ -3,7 +3,7 @@
   "version": "0.0.9",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --host=0.0.0.0 --port=4102",
+    "start": "ng serve --host=0.0.0.0 --port=4102 --proxy-config projects/demo/proxy/proxy.conf.json",
     "build": "ng build",
     "build:lib": "ng-packagr -p package.json",
     "deploy:lib": "npm publish",
@@ -27,6 +27,7 @@
     "@angular/router": "~8.2.14",
     "echarts": "^4.7.0",
     "ngx-echarts": "^4.2.2",
+    "nodemon": "^2.0.4",
     "rxjs": "~6.4.0",
     "socket.io-client": "^2.3.0",
     "tslib": "^1.10.0",

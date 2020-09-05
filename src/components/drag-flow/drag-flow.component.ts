@@ -583,7 +583,7 @@ export class DragFlowComponent implements OnInit {
           }, {
             id: `graphic_delete_${params.id}`,
             $action: 'remove',
-          },{
+          }, {
             id: `graphic_edit_${params.id}`,
             $action: 'remove',
           }]

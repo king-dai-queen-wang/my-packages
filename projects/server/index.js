@@ -12,8 +12,35 @@ server.listen(3000,()=>{
   console.log('server is starting at port 3000');
 });
 
+router.post('/api', async function (ctx, next) {
+  await next('dd');
+});
+
+router.all('/', async function (ctx, next) {
+  ctx.body = '请求成功了';
+  console.log(ctx);
+  await next();
+});
+
+app.use(router.routes()).use(router.allowedMethods());
+
+app.use(async (ctx, next)=> {
+  ctx.set('Access-Control-Allow-Origin', 'http://10.69.9.203:4102');
+  ctx.set('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
+  ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+  ctx.set('Access-Control-Allow-Credentials', 'false');
+
+  if (ctx.method === 'OPTIONS') {
+    ctx.body = 200;
+  } else {
+    await next();
+  }
+});
+
+
 // socket连接
 io.on('connection', (socket) => {
+  console.log('connection');
   connectedCounter++;
   socket.clientNum = connectedCounter;
   socket.nickName = 'user' + connectedCounter;
@@ -65,22 +92,3 @@ function  bindSocketEventListener(socket, event) {
     }
   })
 }
-
-router.all('/', async function (ctx) {
-  ctx.body = '请求成功了'
-});
-
-app.use(router.routes()) .use(router.allowedMethods());
-
-app.use(async (ctx, next)=> {
-  ctx.set('Access-Control-Allow-Origin', 'http://10.69.9.203:4102/');
-  ctx.set('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
-  ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-  ctx.set('Access-Control-Allow-Credentials', 'true');
-
-  if (ctx.method === 'OPTIONS') {
-    ctx.body = 200;
-  } else {
-    await next();
-  }
-});

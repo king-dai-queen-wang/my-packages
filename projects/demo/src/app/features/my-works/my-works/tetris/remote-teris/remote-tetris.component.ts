@@ -2,6 +2,7 @@ import {AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild} from
 import * as io from 'socket.io-client';
 import {TetrisLocal} from '../models/tetris-local';
 import {TetrisRemote} from '../models/tetris-remote';
+import {HttpClient} from '@angular/common/http';
 const SOCKETIO_URL = 'http://10.69.9.203:3000/';
 @Component({
   selector: 'app-remote-tetris',
@@ -25,7 +26,8 @@ export class RemoteTetrisComponent implements OnInit, AfterViewInit {
   localTetris: TetrisLocal;
   remoteTetris: TetrisRemote;
   websocket: SocketIOClient.Socket;
-  constructor(private render2: Renderer2) {
+  constructor(private render2: Renderer2,
+              public httpService: HttpClient) {
   }
 
   ngOnInit() {
@@ -115,6 +117,7 @@ export class RemoteTetrisComponent implements OnInit, AfterViewInit {
 
   disconnect() {
     this.websocket.emit('disconnect');
+    this.websocket = null;
   }
 
   showMsg(str, type) {
@@ -153,5 +156,11 @@ export class RemoteTetrisComponent implements OnInit, AfterViewInit {
     this.websocket.emit('fall');
   }
 
-
+  ajax() {
+    this.httpService.post('/api/', {}).subscribe(
+      (res) => {
+        console.log(res);
+      }
+    );
+  }
 }
