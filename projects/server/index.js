@@ -1,5 +1,5 @@
 const Koa = require('koa');
-const router = require('koa-router')();
+import router from './routers'
 const app = new Koa();
 
 const server = require('http').createServer(app.callback());
@@ -10,16 +10,6 @@ let socketMap = {};
 
 server.listen(3000,()=>{
   console.log('server is starting at port 3000');
-});
-
-router.get('/api', async function (ctx, next) {
-  await next('dd');
-});
-
-router.all('/', async function (ctx, next) {
-  ctx.body = '请求成功了';
-  console.log(ctx);
-  await next();
 });
 
 app.use(router.routes()).use(router.allowedMethods());
@@ -36,7 +26,6 @@ app.use(async (ctx, next)=> {
     await next();
   }
 });
-
 
 // socket连接
 io.on('connection', (socket) => {

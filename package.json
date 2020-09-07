@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --host=0.0.0.0 --port=4102 --proxy-config projects/demo/proxy/proxy.conf.json",
-    "server": "nodemon projects/server/index.js",
+    "server": "nodemon --exec babel-node projects/server/index.js",
     "build": "ng build",
     "build:lib": "ng-packagr -p package.json",
     "deploy:lib": "npm publish",
@@ -26,6 +26,8 @@
     "@angular/platform-browser": "~8.2.14",
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
     "echarts": "^4.7.0",
     "ngx-echarts": "^4.2.2",
     "nodemon": "^2.0.4",
