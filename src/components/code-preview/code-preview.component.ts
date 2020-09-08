@@ -7,7 +7,7 @@ import {DomSanitizer} from '@angular/platform-browser';
   styleUrls: ['./code-preview.component.scss']
 })
 export class CodePreviewComponent implements OnInit, OnChanges {
-
+  response;
   @Input() previewTitle = '';
   @Input() htmlContent = '';
   @Input() codeContent = '';
@@ -34,13 +34,6 @@ export class CodePreviewComponent implements OnInit, OnChanges {
   constructor(private sanitizer: DomSanitizer) { }
 
   ngOnChanges() {
-    if (this.htmlContent) {
-      this.htmlHighlighted = this.sanitizer.bypassSecurityTrustHtml(hljs.highlight('html', this.htmlContent).value);
-    }
-
-    if (this.codeContent) {
-      this.codeHighlighted = this.sanitizer.bypassSecurityTrustHtml(hljs.highlight('typescript', this.codeContent).value);
-    }
 
     if (this.selectedTab) {
       this.activeTab = this.selectedTab === 'code' ? 'code' :
@@ -53,6 +46,16 @@ export class CodePreviewComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+  }
+
+  onHighlight(e) {
+    this.response = {
+      language: e.language,
+      relevance: e.relevance,
+      second_best: '',
+      top: '{...}',
+      value: '{...}'
+    };
   }
 
 }

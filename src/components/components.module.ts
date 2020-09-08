@@ -12,7 +12,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {DirectiveModule} from '../directive/directive.module';
 import { TooltipComponent } from './tooltip/tooltip.component';
 import { CodePreviewComponent } from './code-preview/code-preview.component';
-import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
+import { HighlightModule, HIGHLIGHT_OPTIONS, HighlightOptions } from 'ngx-highlightjs';
 
 @NgModule({
   declarations: [WawaComponent, NavComponent, WolkflowComponent,
@@ -39,7 +39,8 @@ import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
       provide: HIGHLIGHT_OPTIONS,
       useValue: {
         fullLibraryLoader: () => import('highlight.js'),
-      }
+        lineNumbersLoader: () => import('highlightjs-line-numbers.js'),
+      } as HighlightOptions
     }
   ],
 })

@@ -10,16 +10,16 @@ import * as io from 'socket.io-client';
 })
 export class TetrisComponent implements OnInit, AfterViewInit {
   @ViewChild('local_game', {read: ElementRef, static: true}) localGame: ElementRef;
-  @ViewChild('local_next', {read: ElementRef, static: false}) localNext: ElementRef;
-  @ViewChild('local_time', {read: ElementRef, static: false}) localTime: ElementRef;
-  @ViewChild('local_score', {read: ElementRef, static: false}) localScore: ElementRef;
-  @ViewChild('local_result', {read: ElementRef, static: false}) localResult: ElementRef;
+  @ViewChild('local_next', { read: ElementRef }) localNext: ElementRef;
+  @ViewChild('local_time', { read: ElementRef }) localTime: ElementRef;
+  @ViewChild('local_score', { read: ElementRef }) localScore: ElementRef;
+  @ViewChild('local_result', { read: ElementRef }) localResult: ElementRef;
 
   @ViewChild('remote_game', {read: ElementRef, static: true}) remoteGame: ElementRef;
-  @ViewChild('remote_next', {read: ElementRef, static: false}) remoteNext: ElementRef;
-  @ViewChild('remote_time', {read: ElementRef, static: false}) remoteTime: ElementRef;
-  @ViewChild('remote_score', {read: ElementRef, static: false}) remoteScore: ElementRef;
-  @ViewChild('remote_result', {read: ElementRef, static: false}) remoteResult: ElementRef;
+  @ViewChild('remote_next', { read: ElementRef }) remoteNext: ElementRef;
+  @ViewChild('remote_time', { read: ElementRef }) remoteTime: ElementRef;
+  @ViewChild('remote_score', { read: ElementRef }) remoteScore: ElementRef;
+  @ViewChild('remote_result', { read: ElementRef }) remoteResult: ElementRef;
 
   localTetris: TetrisLocal;
   remoteTetris: TetrisLocal;

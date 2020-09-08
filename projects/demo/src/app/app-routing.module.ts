@@ -5,27 +5,27 @@ import { Routes, RouterModule } from '@angular/router';
 const routes: Routes = [
   {
     path: 'home',
-    loadChildren: './features/home/home.module#HomeModule'
+    loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule)
   },
   {
     path: 'my-works',
-    loadChildren: './features/my-works/my-works.module#MyWorksModule'
+    loadChildren: () => import('./features/my-works/my-works.module').then(m => m.MyWorksModule)
   },
   {
     path: 'component',
-    loadChildren: './features/component/component.module#ComponentModule'
+    loadChildren: () => import('./features/component/component.module').then(m => m.ComponentModule)
   },
   {
     path: 'h5-practice',
-    loadChildren: './features/h5-practice/h5-practice.module#H5PracticeModule'
+    loadChildren: () => import('./features/h5-practice/h5-practice.module').then(m => m.H5PracticeModule)
   },
   {
     path: 'data-structure',
-    loadChildren: './features/data-structure/data-structure.module#DataStructureModule'
+    loadChildren: () => import('./features/data-structure/data-structure.module').then(m => m.DataStructureModule)
   },
   {
     path: 'about',
-    loadChildren: './features/about/about.module#AboutModule'
+    loadChildren: () => import('./features/about/about.module').then(m => m.AboutModule)
   }
 ];
 

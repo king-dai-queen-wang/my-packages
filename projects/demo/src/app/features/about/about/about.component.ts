@@ -7,11 +7,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AboutComponent implements OnInit {
   example1 = {
-    html: `  <hw-button (click)="showConfirm()">Confirm</hw-button>
-
-  <hw-button (click)="showConfirm2()">Custom Button Theme</hw-button>
-
-  <hw-confirm></hw-confirm>`,
+    html: `  <pre>
+  <code [highlight]="code"></code>
+</pre>`,
     code: `export interface ConfirmOption {
   title: string;                  // 标题
   icon?: string;                  // 图标，为空则不显示
