@@ -1,4 +1,4 @@
-module.exports.apiRouter = (ctx, next) => {
+module.exports.apiRouter = (ctx: any, next: any) => {
   console.log('>> api');
   next();
   console.log('<< api');

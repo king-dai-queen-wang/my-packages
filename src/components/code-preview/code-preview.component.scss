@@ -1,0 +1,43 @@
+@import '../../styles/mixin';
+@import '~highlight.js/styles/github.css';
+:host {
+  display: block;
+}
+
+header {
+  display: inline-block;
+  font-size: 24px;
+  font-weight: 600;
+  padding: 16px 0;
+}
+
+.tab-nav{
+  display: flex;
+  align-items: center;
+}
+
+.tab-name {
+  @include hoverCursor;
+  width: 120px;
+  padding: 12px;
+  text-align: center;
+
+  &.active {
+    background: #F7F7F7;
+    font-weight: 500;
+    border-color: $border-gray;
+    border-width: 1px 1px 0 1px;
+    margin-bottom: -1px;
+  }
+}
+
+.content {
+  background: #F7F7F7;
+  border: 1px solid $border-gray;
+  padding: 16px;
+}
+
+.html-content, .code-content {
+  font-size: 13px;
+  font-family: monospace;
+}

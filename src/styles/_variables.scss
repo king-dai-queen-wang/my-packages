@@ -1,0 +1,287 @@
+/**
+ * Variables
+ */
+
+// Colors
+// More details at www.honeywell.com/brand/physical/signature-elements/color-material-and-finish
+// ---------------------------------------------------------------------------------------------
+$honeywell-gray-90: #101010;
+$honeywell-gray-85: #303030;
+$honeywell-gray-20: #D0D0D0;
+
+$white: #FFF;
+$blue: #1792E5;
+$black: $honeywell-gray-85;
+$red: #EE3124;
+$green: #7eb338;
+$disabled-grey: $honeywell-gray-20;
+
+$yellow: #ffc627;
+$yellow-light: #ffbc00;
+$purple: #9b59b6;
+$orange: #f36f20;
+$orange2: #F57002;
+$content-bg: #404040;
+$mask-bg: #303030;
+$marker-bg: #45a8ea;
+
+// Borders
+$border-gray : $honeywell-gray-20;
+
+
+// Text
+// ---------------------------
+$text-color-base: #404040;
+$text-color-label: #707070;
+$text-color-comment: #606060;
+$text-color-hint: #808080;
+$text-color-modal: #4a4a4a;
+$text-color-tab: #606060;
+$text-color-placeholder: #a0a0a0;
+$text-size-base: 12px;
+$text-size-large: 14px;
+$text-size-x-large: 16px;
+$text-size-x2-large: 18px;
+$text-size-x3-large: 20px;
+$text-size-tooltip: 12px;
+$text-size-detail: 12px;
+
+// Theme
+// ---------------------------
+$controlPalette: (
+  primary : #008fe7,
+  primary-text : #fff,
+  primary-border : transparent,
+  primary-blue: $blue,
+  primary-blue-text: $white,
+  primary-blue-border: $blue,
+  primary-black: $black,
+  primary-black-text: $white,
+  primary-black-border: $black,
+  primary-red: $red,
+  primary-red-text: $white,
+  primary-red-border: $red,
+  primary-green: $green,
+  primary-green-text: $white,
+  primary-green-border: $green,
+  hollow-blue: $white,
+  hollow-blue-text: $blue,
+  hollow-blue-border: $blue,
+  hollow-black: $white,
+  hollow-black-text: $black,
+  hollow-black-border: $black,
+  link: transparent,
+  link-text: $blue,
+  link-border: transparent,
+  link-gray: transparent,
+  link-gray-text: #707070,
+  link-gray-border: transparent,
+  disabled : $disabled-grey,
+  disabled-text : $white,
+  disabled-border : $disabled-grey,
+  disabled-link : transparent,
+  disabled-link-text : #D0D0D0,
+  disabled-link-border: transparent,
+  cancel : #e5e5e5,
+  cancel-text : #4a4a4a,
+  cancel-border : transparent,
+  warning : #f6ddde,
+  warning-text : #c74043,
+  warning-border : transparent
+);
+
+$controlPalette-hover: (
+  primary: #3b8eff,
+  primary-text : #fff,
+  primary-border : transparent,
+  primary-blue: #1272B2,
+  primary-blue-text: $white,
+  primary-blue-border: #1272B2,
+  primary-black: #404040,
+  primary-black-text: $white,
+  primary-black-border: #404040,
+  primary-green: $green,
+  primary-green-text: $white,
+  primary-green-border: $green,
+  primary-red: $red,
+  primary-red-text: $white,
+  primary-red-border: $red,
+  hollow-blue: $white,
+  hollow-blue-text: #1272B2,
+  hollow-blue-border: #1272B2,
+  hollow-black: $white,
+  hollow-black-text: #A0A0A0,
+  hollow-black-border: #A0A0A0,
+  link: transparent,
+  link-text: #1272B2,
+  link-border: transparent,
+  link-gray: transparent,
+  link-gray-text: #707070,
+  link-gray-border: transparent,
+  disabled : $disabled-grey,
+  disabled-text : $white,
+  disabled-border : $disabled-grey,
+  disabled-link : transparent,
+  disabled-link-text : #D0D0D0,
+  disabled-link-border: transparent,
+  cancel : #e5e5e5,
+  cancel-text : #4a4a4a,
+  cancel-border : transparent,
+  warning : #f6ddde,
+  warning-text : #c74043,
+  warning-border : transparent
+);
+
+$controlPalette-active: (
+  primary: #3b8eff,
+  primary-text : #fff,
+  primary-border : transparent,
+  primary-blue: #0A4166,
+  primary-blue-text: $white,
+  primary-blue-border: #0A4166,
+  primary-black: #707070,
+  primary-black-text: $white,
+  primary-black-border: #707070,
+  primary-green: $green,
+  primary-green-text: $white,
+  primary-green-border: $green,
+  hollow-blue: #0A4166,
+  hollow-blue-text: $white,
+  hollow-blue-border: #0A4166,
+  hollow-black: #707070,
+  hollow-black-text: $white,
+  hollow-black-border: #707070,
+  link: transparent,
+  link-text: #0A4166,
+  link-border: transparent,
+  link-gray: transparent,
+  link-gray-text: #707070,
+  link-gray-border: transparent,
+  disabled : $disabled-grey,
+  disabled-text : $white,
+  disabled-border : $disabled-grey,
+  disabled-link : transparent,
+  disabled-link-text : #D0D0D0,
+  disabled-link-border: transparent,
+  cancel : #e5e5e5,
+  cancel-text : #4a4a4a,
+  cancel-border : transparent,
+  warning : #f6ddde,
+  warning-text : #c74043,
+  warning-border : transparent
+);
+
+// Size
+$size-base: 4px;
+$size1: $size-base;
+$size2: $size-base * 2;
+$size3: $size-base * 3;
+$size4: $size-base * 4;
+$size5: $size-base * 5;
+$size6: $size-base * 6;
+$size7: $size-base * 7;
+$size8: $size-base * 8;
+$size9: $size-base * 9;
+$size10: $size-base * 10;
+$size11: $size-base * 11;
+$size12: $size-base * 12;
+
+
+// Form
+// ---------------------------
+$form-control-height: 24px;
+$form-control-height-lg: 32px;
+$form-control-height-x-lg: 48px;
+$form-control-width: 180px;
+$form-control-width-md: 200px;
+$form-control-width-dateRange: 240px;
+$form-control-width-lg: 360px;
+$form-border-color: #B0B0B0;
+$form-border-color-checkbox: #C0C0C0;
+$form-border-color-focus: $blue;
+$form-border-color-error: $red;
+$form-border-color-success: $green;
+$form-border-color-disabled: #E0E0E0;
+$form-color-warning: #F37021;
+$form-bg-disabled: $honeywell-gray-20;
+$form-text-size: $text-size-base;
+$form-control-padding: 10px;
+
+// Button
+// ---------------------------
+$button-height: $size6;
+$button-height-lg: $size8;
+$button-height-x-lg: 48px;
+$button-padding: 20px;
+
+
+// Animation
+// ---------------------------
+$animation-quick: 150ms;
+$animation-fast: 300ms;
+$animation-slow: 600ms;
+$animation-func: linear;
+
+// Layer
+// ---------------------------
+$layer-hidden: -1;
+$layer-surface: 0;
+$layer-header: 160;
+$layer-menu: 170;
+$layer-mask: 180;
+$layer-aside: 190;
+$layer-notify: 195;
+$layer-modal-mask: 200;
+$layer-modal: 210;
+$layer-drop: 220;
+$layer-loading: 2000;
+$layer-message: 3000;
+$layer-preview-image: 400;
+
+// Message
+// ----------------------------
+$message-width: 35px;
+$message-height: 50px;
+$message-color-success: $green;
+$message-color-error: $red;
+$message-color-info: $blue;
+$message-color-warning: $orange;
+
+// Screen media query size
+$small-screen-order-list: 1024px;
+$small-screen-transport-list: 1366px;
+
+// Calendar
+// ----------------------------
+$calendar-day-width: 35px;
+$calendar-hour-width: 40px;
+$time-calendar-width: 123px;
+$time-conjunction-bg: #F0F0F0;
+$time-conjunction-font-size: 10px;
+
+// Grid
+// ----------------------------
+$grid-empty-text-color: #B0B0B0;
+$grid-empty-text-size: $text-size-x-large;
+$alter-bg: #F7F7F7;
+$table-alt-color: #f9f9f9;
+
+// Switch
+// ----------------------------
+$switch-size: 42px;
+$switch-bar-height: 16px;
+$switch-bar-width: 42px;
+$switch-thumb-size: 24px;
+
+// Aside
+// ----------------------------
+$aside-bg: #FBFBFB;
+$aside-margin: 70px;
+
+// Notification
+// -----------------------------
+$notification-width: 250px;
+
+// currentBackground
+$current-background: #7EB338;
+

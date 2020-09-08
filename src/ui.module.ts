@@ -5,10 +5,11 @@ import {ComponentsModule} from './components/components.module';
 @NgModule({
   imports: [
     ComponentsModule,
-    DirectiveModule
+    DirectiveModule,
   ],
   exports: [
-    ComponentsModule
+    ComponentsModule,
+    DirectiveModule,
   ]
 })
 export class UiModule { }

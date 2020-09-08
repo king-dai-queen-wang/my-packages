@@ -46,3 +46,5 @@ testem.log
 Thumbs.db
 /projects/server/node_modules/
 /projects/server/package-lock.json
+/projects/server/dist/
+/package-lock.json

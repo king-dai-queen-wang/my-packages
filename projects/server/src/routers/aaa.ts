@@ -1,3 +1,3 @@
-export const main = ctx => {
+export const main = (ctx: any) => {
   ctx.response.body = 'Hello World';
 };

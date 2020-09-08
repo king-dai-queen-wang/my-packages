@@ -3,7 +3,7 @@ import * as io from 'socket.io-client';
 import {TetrisLocal} from '../models/tetris-local';
 import {TetrisRemote} from '../models/tetris-remote';
 import {HttpClient} from '@angular/common/http';
-const SOCKETIO_URL = 'http://10.69.9.203:3000/';
+const SOCKETIO_URL = 'http://localhost:3000/';
 @Component({
   selector: 'app-remote-tetris',
   templateUrl: './remote-tetris.component.html',

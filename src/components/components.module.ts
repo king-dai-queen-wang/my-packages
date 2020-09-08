@@ -11,12 +11,12 @@ import {NgxEchartsModule} from 'ngx-echarts';
 import {HttpClientModule} from '@angular/common/http';
 import {DirectiveModule} from '../directive/directive.module';
 import { TooltipComponent } from './tooltip/tooltip.component';
-
-
+import { CodePreviewComponent } from './code-preview/code-preview.component';
+import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 
 @NgModule({
   declarations: [WawaComponent, NavComponent, WolkflowComponent,
-    DragFlowComponent, DragDropDashboardComponent, TooltipComponent],
+    DragFlowComponent, DragDropDashboardComponent, TooltipComponent, CodePreviewComponent],
   imports: [
     CommonModule,
     RouterModule,
@@ -24,13 +24,23 @@ import { TooltipComponent } from './tooltip/tooltip.component';
     NgxEchartsModule,
     DirectiveModule,
     HttpClientModule,
+    HighlightModule
   ],
   exports: [
     WawaComponent,
     NavComponent,
     DragFlowComponent,
     WolkflowComponent,
+    CodePreviewComponent,
     DragDropDashboardComponent,
-  ]
+  ],
+  providers: [
+    {
+      provide: HIGHLIGHT_OPTIONS,
+      useValue: {
+        fullLibraryLoader: () => import('highlight.js'),
+      }
+    }
+  ],
 })
 export class ComponentsModule { }

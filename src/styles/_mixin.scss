@@ -1,0 +1,222 @@
+/**
+ * Mixin
+ */
+@import "variables";
+
+@mixin textBase() {
+  color: $text-color-base;
+  font-size: $text-size-base;
+}
+
+@mixin getNormalTheme($themeName:default) {
+  background: map-get($controlPalette, $themeName);
+  color: map-get($controlPalette, $themeName + '-text');
+  border-color: map-get($controlPalette, $themeName + '-border');
+}
+
+@mixin getHoverTheme($themeName:default) {
+  &:hover {
+    background: map-get($controlPalette-hover, $themeName);
+    color: map-get($controlPalette-hover, $themeName + '-text');
+    border-color: map-get($controlPalette-hover, $themeName + '-border');
+  }
+}
+
+@mixin getActiveTheme($themeName:default) {
+  &:active {
+    background: map-get($controlPalette-active, $themeName);
+    color: map-get($controlPalette-active, $themeName + '-text');
+    border-color: map-get($controlPalette-active, $themeName + '-border');
+  }
+}
+
+@mixin getTheme($themeName) {
+  @include getNormalTheme($themeName);
+
+  @include getHoverTheme($themeName);
+
+  @include getActiveTheme($themeName);
+}
+
+@mixin hoverCursor() {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+@mixin absolute($top:0, $left:0, $right:0, $bottom:0) {
+  position: absolute;
+  top: $top;
+  left: $left;
+  right: $right;
+  bottom: $bottom;
+}
+
+@mixin fixed($top:0, $left:0, $right:0, $bottom:0) {
+  position: fixed;
+  top: $top;
+  left: $left;
+  right: $right;
+  bottom: $bottom;
+}
+
+// Layouts
+// ---------------------------------------------
+
+@mixin centerFixed() {
+  @include fixed($top: 50%, $left: 50%, $right: auto, $bottom: auto);
+  transform: translate(-50%, -50%);
+}
+
+@mixin onLargeScreen() {
+  @media screen and (min-width: $large-width) {
+    @content;
+  }
+}
+
+@mixin onSmallScreen() {
+  @media screen and (max-width: $large-width) {
+    @content;
+  }
+}
+
+// Ellipsis
+// ---------------------------
+
+@mixin ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Alignment
+// ----------------------------
+@mixin flexCenter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@mixin flexOneRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+// Controls
+// -----------------------------
+@mixin button {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: bottom;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 0;
+  padding: 0 $button-padding;
+  height: $button-height;
+}
+
+@mixin iconButton {
+  background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+@mixin form-control {
+  display: inline-block;
+  vertical-align: middle;
+  //padding: 0 $form-control-padding;
+  border: 1px solid $form-border-color;
+  height: $form-control-height-lg;
+  line-height: $form-control-height-lg;
+
+  &:focus {
+
+  }
+}
+
+// Modal
+// ---------------------------
+
+@mixin modal() {
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: $layer-surface;
+  transform: translate(-50%, -30%);
+  transition: all $animation-fast $animation-func;
+
+  &.opened {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%);
+    z-index: $layer-modal;
+  }
+
+  .ie10 & {
+    z-index: $layer-hidden;
+    transition: none;
+
+    &.opened {
+      z-index: $layer-modal;
+    }
+  }
+}
+
+@mixin mask() {
+  background: $honeywell-gray-85;
+  opacity: .5;
+  z-index: $layer-mask;
+}
+
+// Clearfix
+// --------------------------------
+.clearfix {
+  &::before, &::after {
+    display: table;
+    content: ' ';
+  }
+  &::before {
+    clear: both;
+  }
+}
+
+// Detail Info Layout
+// --------------------------------
+@mixin detailPage {
+  min-width: $detail-min-width;
+}
+
+// Messages
+// ---------------------------------
+@mixin message {
+  position: fixed;
+  left: 0;
+  right: 0;
+  background: #fff;
+  height: $message-height;
+  line-height: $message-height;
+}
+
+// Loading
+// --------------------------------
+@mixin loading {
+  @include fixed;
+  @include mask;
+  z-index: $layer-loading;
+}
+
+// Sidebar
+// --------------------------------
+@mixin sidebarContainer {
+  display: block;
+  margin: 10px;
+  padding-bottom: 50px;
+}

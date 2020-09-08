@@ -25,7 +25,8 @@
       "ng-angular-component/*": [
         "dist/ng-angular-component/*"
       ]
-    }
+    },
+    "types": ["node"]
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
