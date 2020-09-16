@@ -1,103 +1,42 @@
 {
-  "name": "dww-angular-component",
-  "version": "0.0.9",
+  "name": "my-packages",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve --host=0.0.0.0 --port=4102 --proxy-config projects/demo/proxy/proxy.conf.json",
-    "server": "nodemon --exec babel-node projects/server/src/index.ts",
-    "build": "ng build",
-    "build:lib": "ng-packagr -p package.json",
-    "deploy:lib": "npm publish",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e",
-    "clean-remote": "ssh ubuntu@ rm -rf /home/ubuntu/dww-test/tmp/*",
-    "copy-remote": "scp -r dist/* ubuntu@:/home/ubuntu/dww-test/tmp",
-    "build:prod": "ng build --prod",
-    "deploy:prod": "npm run clean-remote & npm run copy-remote"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
   },
-  "private": false,
   "dependencies": {
-    "@angular/animations": "~10.1.0",
-    "@angular/common": "~10.1.0",
-    "@angular/compiler": "~10.1.0",
-    "@angular/core": "~10.1.0",
-    "@angular/forms": "~10.1.0",
-    "@angular/platform-browser": "~10.1.0",
-    "@angular/platform-browser-dynamic": "~10.1.0",
-    "@angular/router": "~10.1.0",
-    "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.7.0",
-    "echarts": "^4.7.0",
-    "highlight.js": "^10.2.0",
-    "highlightjs-line-numbers.js": "^2.8.0",
-    "ngx-echarts": "^4.2.2",
-    "ngx-highlightjs": "^4.1.1",
-    "nodemon": "^2.0.4",
-    "rxjs": "~6.6.3",
-    "socket.io-client": "^2.3.0",
-    "tslib": "^2.0.0",
-    "zone.js": "~0.10.2"
+    "core-js": "^3.6.5",
+    "vue": "^2.6.11"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.1001.0",
-    "@angular-devkit/build-ng-packagr": "~0.1001.0",
-    "@angular/cli": "~10.1.0",
-    "@angular/compiler-cli": "~10.1.0",
-    "@angular/language-service": "~10.1.0",
-    "@types/jasmine": "~3.3.8",
-    "@types/jasminewd2": "~2.0.3",
-    "@types/node": "^12.11.1",
-    "@types/socket.io-client": "^1.4.32",
-    "codelyzer": "^5.1.2",
-    "jasmine-core": "~3.5.0",
-    "jasmine-spec-reporter": "~5.0.0",
-    "karma": "~5.0.0",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage-istanbul-reporter": "~3.0.2",
-    "karma-jasmine": "~4.0.0",
-    "karma-jasmine-html-reporter": "^1.5.0",
-    "ng-packagr": "^10.1.0",
-    "protractor": "~7.0.0",
-    "ts-node": "~7.0.0",
-    "tslint": "~6.1.0",
-    "typescript": "~4.0.2"
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "vue-template-compiler": "^2.6.11"
   },
-  "description": "This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.20.",
-  "main": "src/ui.module.ts",
-  "ngPackage": {
-    "lib": {
-      "entryFile": "index.ts"
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
     },
-    "whitelistedNonPeerDependencies": [
-      "@angular/animations",
-      "@angular/common",
-      "@angular/compiler",
-      "@angular/core",
-      "@angular/forms",
-      "@angular/http",
-      "@angular/platform-browser",
-      "@angular/platform-browser-dynamic",
-      "@angular/router",
-      "core-js",
-      "moment",
-      "responsive-css-starter",
-      "rxjs",
-      "zone.js",
-      "echarts"
-    ]
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/king-dai-queen-wang/my-packages.git"
-  },
-  "keywords": [
-    "angular"
-  ],
-  "author": "david dai",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/king-dai-queen-wang/my-packages/issues"
-  },
-  "homepage": "https://github.com/king-dai-queen-wang/my-packages#readme"
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }
