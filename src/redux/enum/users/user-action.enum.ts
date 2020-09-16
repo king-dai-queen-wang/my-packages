@@ -1,0 +1,4 @@
+export enum UserActionEnum {
+    FETCH_USER = 'FETCH_USER',
+    FETCH_USER_FULFILLED = 'FETCH_USER_FULFILLED',
+}
