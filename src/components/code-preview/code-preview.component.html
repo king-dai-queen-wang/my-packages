@@ -12,6 +12,12 @@
        (click)="selectTab('html')">
     Html
   </div>
+  <div *ngIf="cssContent"
+       class="tab-name"
+       [class.active]="showCssTab"
+       (click)="selectTab('css')">
+    CSS
+  </div>
   <div *ngIf="codeContent"
        class="tab-name"
        [class.active]="showCodeTab"
@@ -26,7 +32,11 @@
   </ng-container>
 
   <div *ngIf="showHtmlTab" class="html-content">
-    <pre><code [highlight]="htmlContent" [lineNumbers]="true" (highlighted)="onHighlight($event)" ></code></pre>
+    <pre><code [highlight]="htmlContent" [lineNumbers]="true"></code></pre>
+  </div>
+
+  <div *ngIf="showCssTab" class="css-content">
+    <pre><code [highlight]="cssContent" [lineNumbers]="true"></code></pre>
   </div>
 
   <div *ngIf="showCodeTab" class="code-content">

@@ -1,0 +1,28 @@
+:host {
+  position: relative;
+}
+.tooltip{
+  opacity: 0;
+  transition: opacity 500ms ease-in-out;
+  width: 20rem;
+  position: absolute;
+  left: 0;
+  z-index: 1;
+  box-shadow: -1px 0px 17px 7px rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  background: white;
+  margin: 4px;
+  &::before{
+    content: '';
+    border: 5px solid transparent;
+    border-right-color: white;
+    position: absolute;
+    top: 20%;
+    left: -10px;
+    transform: translateY(-50%);
+  }
+}
+
+.tooltip.open{
+  opacity: 0.5;
+}

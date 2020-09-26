@@ -7,17 +7,14 @@ import {DomSanitizer} from '@angular/platform-browser';
   styleUrls: ['./code-preview.component.scss']
 })
 export class CodePreviewComponent implements OnInit, OnChanges {
-  response;
   @Input() previewTitle = '';
   @Input() htmlContent = '';
+  @Input() cssContent = '';
   @Input() codeContent = '';
   @Input() selectedTab = '';
 
   // activeTab name should be demo/html/code
   activeTab = 'demo';
-
-  htmlHighlighted = null;
-  codeHighlighted = null;
 
   get showDemoTab(): boolean {
     return this.activeTab === 'demo';
@@ -25,6 +22,10 @@ export class CodePreviewComponent implements OnInit, OnChanges {
 
   get showHtmlTab(): boolean {
     return this.activeTab === 'html';
+  }
+
+  get showCssTab(): boolean {
+    return this.activeTab === 'css';
   }
 
   get showCodeTab(): boolean {
@@ -46,16 +47,6 @@ export class CodePreviewComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-  }
-
-  onHighlight(e) {
-    this.response = {
-      language: e.language,
-      relevance: e.relevance,
-      second_best: '',
-      top: '{...}',
-      value: '{...}'
-    };
   }
 
 }

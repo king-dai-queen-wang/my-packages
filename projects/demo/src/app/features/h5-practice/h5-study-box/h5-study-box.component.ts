@@ -6,7 +6,23 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./h5-study-box.component.scss']
 })
 export class H5StudyBoxComponent implements OnInit {
-
+  htmlContent = `
+<div class="outer">
+    <div class="inner"></div>
+  </div>`;
+  codeContent = ``;
+  cssContent = `.outer{
+  width: 800px;
+  height: 100px;
+  border: 10px solid red;
+}
+.inner{
+  width: 200px;
+  height: 100px;
+  background: #dadbdd;
+  padding: auto;
+}
+`;
   constructor() { }
 
   ngOnInit() {

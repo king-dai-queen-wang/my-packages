@@ -1,10 +1,14 @@
-<p>h5-study-box works!</p>
-元素水平方向上的布局：
+<dww-code-preview previewTitle="H5 盒子模型"
+                  [htmlContent]="htmlContent"
+                  [cssContent]="cssContent"
+                  [codeContent]="codeContent">
+  元素水平方向上的布局：
   元素在父元素中水平方向的位置由以下几个属性共同决定：
-    margin-left,border-left,padding-left,width,padding-right,border-right,margin-right
-    一个元素在父元素中，水平排布必须满足以下等式：
-    margin-left + border-left + padding-left + width + padding-right + border-right + margin-right = 父元素内容区的宽度（必须满足）
-    如果不能满足则称之为过度约束，则浏览器会自动调整，如果着7个值没有auto的情况，则会自动调整margin-right使其等式成立。
-<div class="outer">
-  <div class="inner"></div>
-</div>
+  margin-left,border-left,padding-left,width,padding-right,border-right,margin-right
+  一个元素在父元素中，水平排布必须满足以下等式：
+  margin-left + border-left + padding-left + width + padding-right + border-right + margin-right = 父元素内容区的宽度（必须满足）
+  如果不能满足则称之为过度约束，则浏览器会自动调整，如果着7个值没有auto的情况，则会自动调整margin-right使其等式成立。
+  <div class="outer">
+    <div class="inner"></div>
+  </div>
+</dww-code-preview>

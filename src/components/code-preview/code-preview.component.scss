@@ -1,4 +1,5 @@
 @import '../../styles/mixin';
+
 :host {
   display: block;
 }
@@ -36,7 +37,7 @@ header {
   padding: 16px;
 }
 
-.html-content, .code-content {
+.html-content, .html-content, .code-content {
   font-size: 13px;
   font-family: monospace;
 }
