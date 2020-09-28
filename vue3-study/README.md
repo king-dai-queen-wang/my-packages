@@ -1,4 +1,4 @@
-# my-packages
+# vue3-study
 
 ## Project setup
 ```
