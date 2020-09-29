@@ -1,0 +1,15 @@
+.zf-tree{
+  position: relative;
+  text-align: left;
+}
+.zf-tree-list {
+  padding-left: 20px;
+}
+.zf-tree-indicator{
+  position: absolute;
+  border: 1px solid red;
+  width: 100%;
+}
+.zf-tree-no-expand .zf-icon{
+  visibility: hidden;
+}
