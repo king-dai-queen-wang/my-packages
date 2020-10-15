@@ -9,7 +9,7 @@ export default {
     setup(props) {
         let data;
         // props.data 渲染的每一条数据
-        watchEffect(()=>{ // 获取的是当前用户传递来的数据
+        watchEffect(() => { // 获取的是当前用户传递来的数据
             data = props.data
         });
         // 获取父组件定义的 TREE_PROVIDER
@@ -60,17 +60,31 @@ export default {
         // 定义drag Event
         const dragEvent = {
             ...(draggable?{
+                draggable: true,
                 onDragstart(e){
                     e.stopPropagation(); // 组件的实例中 $el
                    treeMethods.dragStart(e,instance,data)
                 },
                 onDragover(e){
+                    e.preventDefault();
                     e.stopPropagation();
                     treeMethods.dragOver(e,instance,data)
                 },
                 onDragend(e){
                     e.stopPropagation();
                     treeMethods.dragEnd(e,instance,data)
+                },
+                onDragEnter(e){
+                    e.stopPropagation();
+                    treeMethods.dragEnter(e,instance,data)
+                },
+                onDragLeave(e){
+                    e.stopPropagation();
+                    treeMethods.dragLeave(e,instance,data)
+                },
+                onDrop(e){
+                    e.stopPropagation();
+                    treeMethods.drop(e, data, instance,data);
                 }
             }:{})
         }

@@ -2,7 +2,7 @@
   <div class="hello">
 <!--  若传参  :load="fetchData" 则为懒加载，若不传此参数则为直接展开-->
     <zf-tree ref="tree" :data="data" :draggable="true"
-             :load="fetchData" >
+             :load="fetchData" :dropFn="dropFn">
       <!--template 为slot插槽展示的内容-->
       <template v-slot="item">
         {{item.key}}-{{item.name}}
@@ -24,6 +24,7 @@ export default {
   methods:{
     getData() {
       console.log(this.$refs.tree.getCheckNodes());
+      // this.data = this.data.concat(this.data);
     },
   },
    data() {
@@ -66,7 +67,20 @@ export default {
           f().then(res => {
             cb(res);
           });
-       }
+       },
+       /*dropFn: (draggingNode, dropNode, dropPosition) => {
+           console.log('drop', draggingNode, dropNode, dropPosition)
+           if (dropPosition === 0) { // 正处于target node处
+               (dropNode.children).push(draggingNode);
+               console.log('处于target node 正中');
+           } else if (dropPosition === -1) { // 处于target node 上层
+               const parent = this.$refs.tree.getNodeParent(dropNode);
+               console.log('处于target node 上层', parent);
+           } else if (dropPosition === 1) { // 处于target node 下层
+               const parent = this.$refs.tree.getNodeParent(dropNode);
+               console.log('处于target node 下层', parent);
+           }
+       }*/
      }
    },
 

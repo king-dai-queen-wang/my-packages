@@ -2,6 +2,9 @@
   position: relative;
   text-align: left;
 }
+.zf-tree-label.inner-focus{
+  background: aqua;
+}
 .zf-tree-list {
   padding-left: 20px;
 }

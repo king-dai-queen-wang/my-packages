@@ -18,6 +18,12 @@ export default {
         draggable: {
             type: Boolean,
             default: false
+        },
+        dragEndFn: {
+            type: Function
+        },
+        dropFn: {
+            type: Function
         }
     },
     // @参考链接 https://blog.csdn.net/weixin_44593720/article/details/108709143
@@ -43,11 +49,22 @@ export default {
         //reactive 数据模型转换成响应式模型
         // 参考链接 https://blog.csdn.net/huige232508/article/details/108189484
         const state = reactive({
+            dropNode: null,
             dropPosition: '',// 拖拽的位置 0 表示放到里面去 作为儿子  1 作为哥哥 -1 弟弟
             dragNode: null, // 拖动的这个元素的数据
             draggingNode: null, // 拖拽的实例 
             showIndicator: false
         });
+
+        function clearState() {
+            watchEffect(() => {
+                state.dropPosition = '';// 拖拽的位置 0 表示放到里面去 作为儿子  1 作为哥哥 -1 弟弟
+                state.dragNode = null;// 拖动的这个元素的数据
+                state.draggingNode = null; // 拖拽的实例
+                state.showIndicator = false; // 隐藏指示线
+            });
+
+        }
 
         function renderNode(data) {
             if (data && data.length === 0) {
@@ -57,6 +74,12 @@ export default {
         }
         // 定义方法
         const methods = {
+            // 获取父节点
+            getNodeParent(node) {
+                let parent = flatMap[node.key].parent; // 获取当前这个节点的父亲
+                if (!parent) return;
+                return parent;
+            },
             // 获取选中节点
             getCheckNodes() {
                 return Object.values(flatMap).filter(item => item.node.checked)
@@ -88,6 +111,20 @@ export default {
                 state.dragNode = data;
                 console.log('dragStart', nodeInstance, data)
             },
+            dragEnter(e, nodeInstance, data) {
+                if (state.dragNode.key === data.key) {
+                    return; // 不能在自己身上操作
+                }
+                let overElm = nodeInstance.ctx.$el; // 经过的人
+                if (state.draggingNode.ctx.$el.contains(overElm)) {// 当前拖动的人
+                    return
+                }
+                overElm.querySelector('.zf-tree-label').classList.add('inner-focus');
+            },
+            dragLeave(e, nodeInstance) {
+                let overElm = nodeInstance.ctx.$el; // 经过的人
+                overElm.querySelector('.zf-tree-label').classList.remove('inner-focus');
+            },
             // 拖动经过
             dragOver(e, nodeInstance, data) {
                 if (state.dragNode.key === data.key) {
@@ -113,7 +150,6 @@ export default {
 
                 let iconPosition = overElm.querySelector('.zf-icon').getBoundingClientRect();
                 let indicatorTop = -9999;
-
                 if (state.dropPosition === 1) {
                     indicatorTop = iconPosition.top - treePosition.top; // 当前这个线距离树的顶部位置
                 } else if (state.dropPosition === -1) {
@@ -124,17 +160,42 @@ export default {
                 indicator.style.top = indicatorTop + 'px';
                 indicator.style.left = iconPosition.right - treePosition.left + 'px';
                 state.showIndicator = (state.dropPosition === 1) || (state.dropPosition === -1);
+                // 赋值拖放目标node
+                state.dropNode = data;
                 console.log('dragOver', nodeInstance, data, state.dropPosition);
 
             },
             // 拖动结束
             dragEnd(e, nodeInstance, data) {
-                debugger
-                state.dropPosition = '';// 拖拽的位置 0 表示放到里面去 作为儿子  1 作为哥哥 -1 弟弟
-                state.dragNode = null;// 拖动的这个元素的数据
-                state.draggingNode = null; // 拖拽的实例 
-                state.showIndicator = false; // 隐藏指示线
-                console.log('dragEnd', nodeInstance, data)
+                console.log('dragEnd1', {
+                    dropNode: state.dropNode,
+                    data,
+                    dropPosition: state.dropPosition,
+                    dragNode: state.dragNode,
+                    draggingNode: state.draggingNode
+                });
+                // console.log('dragEnd2', nodeInstance, data, state.dropPosition);
+            },
+            drop(e, nodeInstance, data) {
+                console.log('drop', e, nodeInstance, data);
+                let {dropPosition, draggingNode, dropNode} = {};
+                watchEffect(() => {
+                    dropPosition = state.dropPosition;
+                    draggingNode = state.draggingNode;
+                    dropNode = state.dropNode;
+                });
+                if (dropPosition === 0) { // 正处于target node处
+                    (dropNode.children).push(draggingNode);
+                    console.log('处于target node 正中');
+                } else if (dropPosition === -1) { // 处于target node 上层
+                    const parent = this.getNodeParent(dropNode);
+                    console.log('处于target node 上层', parent);
+                } else if (dropPosition === 1) { // 处于target node 下层
+                    const parent = this.getNodeParent(dropNode);
+                    console.log('处于target node 下层', parent);
+                }
+                // props.dropFn(state.dragNode, state.dropNode, state.dropPosition);
+                clearState();
             }
         };
 
@@ -147,6 +208,7 @@ export default {
             treeMethods: methods,
             slot: context.slots.default,
             load: props.load,
+            dragEndFn: props.dragEndFn,
             draggable: props.draggable
         });
         instance.ctx.getCheckNodes = methods.getCheckNodes;
